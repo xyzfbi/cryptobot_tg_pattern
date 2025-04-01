@@ -1,0 +1,12 @@
+name: cryptobot_tg
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.12.9
+  - pip=25.0
+  - setuptools=72.1.0
+  - wheel=0.45.1
+  - pip:
+    - selenium>=4.0
+    - pywin32>=300; sys_platform == 'win32'
