@@ -29,9 +29,10 @@ crypto_df = pd.DataFrame(
 
     ]
 )
+
 crypto_df = crypto_df.apply(pd.to_numeric, errors="coerce") # все в числа
 crypto_df["datetime"] = pd.to_datetime(crypto_df["datetime"], unit="ms") # крч меняем юникс время в нормальное и свечи запрашиваются в обратном порядке те от ближайшего к нам до самого позднего
-
+crypto_df["quote_volume"] = crypto_df["quote_volume"].apply(lambda x: f"{x/1e6:.2f}M") # ВЫВОД В МИЛЛИОНАХ А НЕ В ТУПОЙ EXP ** форме
 # резы от апи в этих крч массивах
 '''
 print(f"Данные для {symbol} (таймфрейм: {timeframe} минут):")
