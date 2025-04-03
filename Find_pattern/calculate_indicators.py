@@ -31,23 +31,28 @@ def calculate_ichimoku(df, tenkan_num = 9,  kijun_period = 26, senkou_period = 5
 
 def find_indicators(highframe_df, lowframe_df):
     # module high time frame
-    high = highframe_df['high']
-    close = highframe_df["close"]
-    low = highframe_df["low"]
+    high_htf = highframe_df['high']
+    close_htf = highframe_df["close"]
+    low_htf = highframe_df["low"]
 
-    sma150_htf = ta.SMA(close, 150)
-    adx_htf = ta.ADX(high, low, close, 14)
+    high_ltf = lowframe_df['high']
+    close_ltf = lowframe_df["close"]
+    low_ltf = lowframe_df["low"]
+
+    sma150_htf = ta.SMA(close_htf, 150)
+    adx_htf = ta.ADX(high_htf, low_htf, close_htf, 14)
+    # macd_line, macd_signal, macd_hist = ta.MACD(close, fastperiod=12, slowperiod=26, signalperiod=9)
     ichimoku_htf = calculate_ichimoku(highframe_df)
     indicators_htf = pd.DataFrame({
-        'sma150': sma150_htf,
-        'adx': adx_htf,
+        'sma150': sma150_htf, # общий тренд
+        'adx': adx_htf, # сила тренда
     })
     indicators_htf = pd.concat([indicators_htf, ichimoku_htf], axis=1)
     # module low timeframee
 
-    ema50_ltf = ta.EMA(close, 50)
-    rsi12_ltf = ta.RSI(close, 12)
-    atr7_ltf = ta.ATR(high, low, close, 7)
+    ema50_ltf = ta.EMA(close_ltf, 50)
+    rsi12_ltf = ta.RSI(close_ltf, 12)
+    atr7_ltf = ta.ATR(high_ltf, low_ltf, close_ltf, 7)
     indicators_ltf = pd.DataFrame({
         'ema50': ema50_ltf,
         'rsi12': rsi12_ltf,
