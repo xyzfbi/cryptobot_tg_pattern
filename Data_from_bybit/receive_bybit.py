@@ -3,45 +3,69 @@ from pybit.unified_trading import HTTP
 
 session = HTTP()
 
-# запрос данных за ласт 24 часа с интервалом в час крч
-symbol = "BTCUSDT"
-timeframe = "60"  # 60 минут = 1 час
-limit = 24       # 24 свечи
 
-response = session.get_kline(
-    category="spot",  # или "linear" - usdt -фьючи, "inverse" - обратные фьючи
-    symbol=symbol, # пара торговли
-    interval=timeframe, # нутут все понятнл
-    limit=limit # количество свеч
-    # start = ... # эт короче временной интервал запроса данных
-    # end = ... # ну эт конец понятно вроже
-)
-crypto_df = pd.DataFrame(
-    response["result"]["list"],
-    columns=[
-        "datetime",
-        "open",
-        "high",
-        "low",
-        "close",
-        "volume", # это в биткоинах тут
-        "quote_volume", # это в usdt
 
-    ]
-)
 
-crypto_df = crypto_df.apply(pd.to_numeric, errors="coerce") # все в числа
-crypto_df["datetime"] = pd.to_datetime(crypto_df["datetime"], unit="ms") # крч меняем юникс время в нормальное и свечи запрашиваются в обратном порядке те от ближайшего к нам до самого позднего
-crypto_df["quote_volume"] = crypto_df["quote_volume"].apply(lambda x: f"{x/1e6:.2f}M") # ВЫВОД В МИЛЛИОНАХ А НЕ В ТУПОЙ EXP ** форме
-# резы от апи в этих крч массивах
-'''
-print(f"Данные для {symbol} (таймфрейм: {timeframe} минут):")
-for candle in response["result"]["list"]:
-    print(candle)
-    '''
+class CandlesData:
+    def __init__(self, symbol="BTCUSDT"): # по дфеолту такой символ
+        self.session = HTTP()
+        self.symbol = symbol
+        self.timeframes = {
+            '4h': 240,
+            '1d': 'D'
+        }
+    @staticmethod
+    def normalize_df(df):
+        df = df.apply(pd.to_numeric, errors="coerce")  # все в числа
+        df["datetime"] = pd.to_datetime(df["datetime"],
+                                        unit="ms")  # крч меняем юникс время в нормальное и свечи запрашиваются в обратном порядке те от ближайшего к нам до самого позднего
+        df["quote_volume"] = df["quote_volume"].apply(
+            lambda x: f"{x / 1e6:.2f}M")  # ВЫВОД В МИЛЛИОНАХ А НЕ В ТУПОЙ EXP ** форме
+        return df
+    def fetch_candles(self, interval, limit):
+        response = session.get_kline(
+            category="spot",
+            symbol=self.symbol,
+            interval=str(interval),
+            limit=limit
+        )
 
-# вывод датафрейма с криптой хз как настроить
-print(crypto_df)
+        df = pd.DataFrame(
+            response["result"]["list"],
+            columns=[
+                "datetime",
+                "open",
+                "high",
+                "low",
+                "close",
+                "volume",  # это в биткоинах тут
+                "quote_volume",  # это в usdt
+            ]
+        )
+        return self.normalize_df(df)
+
+    def get_pattern_indicators_data(self, candles_count=30, timeframe='4h'):
+        return self.fetch_candles(self.timeframes[timeframe], candles_count)
+
+    def get_trend_data(self, candles_count=80, timeframe='1d'):
+        return self.fetch_candles(self.timeframes[timeframe], candles_count)
+
+    def candles_csv(self, df, timeframe, df_name):
+        filename = f"{self.symbol}_{df_name}_{timeframe}.csv"
+        df.to_csv(filename, index=False)
+        return filename
+
+
+if __name__ == "__main__": #точка входа
+    data = CandlesData("ETHUSDT")
+    for_pattern = data.get_pattern_indicators_data()
+
+    for_trend = data.get_trend_data()
+    print(for_trend)
+    print(for_pattern)
+    data.candles_csv(for_pattern, df_name="for_pattern",timeframe="4h")
+
+
 '''
 Содержание свечи
 
