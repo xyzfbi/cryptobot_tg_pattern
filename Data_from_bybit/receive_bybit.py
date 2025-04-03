@@ -44,10 +44,10 @@ class CandlesData:
         )
         return self.normalize_df(df)
 
-    def get_pattern_indicators_data(self, candles_count=30, timeframe='4h'):
+    def get_pattern_indicators_data(self, candles_count=50, timeframe='4h'):
         return self.fetch_candles(self.timeframes[timeframe], candles_count)
 
-    def get_trend_data(self, candles_count=80, timeframe='1d'):
+    def get_trend_data(self, candles_count=150, timeframe='1d'):
         return self.fetch_candles(self.timeframes[timeframe], candles_count)
 
     def candles_csv(self, df, timeframe, df_name):
