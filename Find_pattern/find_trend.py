@@ -77,10 +77,10 @@ def sl_tp(last, signal):
         ]
 
     return sl, tp
-
+# ADD OBV MFI VOLUME URGENTLY
 if __name__ == "__main__":
-        trend = CandlesData("BTCUSDT").get_trend_data()
-        pattern = CandlesData("BTCUSDT").get_pattern_indicators_data()
+        trend = CandlesData("ETHUSDT").get_trend_data()
+        pattern = CandlesData("ETHUSDT").get_pattern_indicators_data()
         trend_indicators, pattern_indicators = find_indicators(trend, pattern)
 
         trend_direction, trend_strength, last = analyze_trend(trend_indicators, pattern_indicators, trend)
