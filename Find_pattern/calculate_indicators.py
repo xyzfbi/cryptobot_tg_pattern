@@ -1,8 +1,7 @@
 from Data_from_bybit.receive_bybit import CandlesData
 import pandas as pd
 import talib as ta
-from technical.indicators import ichimoku
-data = CandlesData("BTCUSDT").get_trend_data()
+
 def calculate_ichimoku(df, tenkan_num = 9,  kijun_period = 26, senkou_period = 52):
     result_df = pd.DataFrame()
 
@@ -59,6 +58,7 @@ def find_indicators(highframe_df, lowframe_df):
 
 
 if __name__ == "__main__":
+    data = CandlesData("BTCUSDT").get_trend_data()
     trend_df = CandlesData("BTCUSDT").get_trend_data()
     patterns_df = CandlesData("BTCUSDT").get_pattern_indicators_data()
 
