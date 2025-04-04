@@ -38,6 +38,7 @@ def find_indicators(highframe_df, lowframe_df):
     high_ltf = lowframe_df['high']
     close_ltf = lowframe_df["close"]
     low_ltf = lowframe_df["low"]
+    volume_ltf = lowframe_df["quote_volume"]
 
     sma150_htf = ta.SMA(close_htf, 150)
     adx_htf = ta.ADX(high_htf, low_htf, close_htf, 14)
@@ -50,22 +51,27 @@ def find_indicators(highframe_df, lowframe_df):
     indicators_htf = pd.concat([indicators_htf, ichimoku_htf], axis=1)
     # module low timeframee
 
-    ema50_ltf = ta.EMA(close_ltf, 50)
-    rsi12_ltf = ta.RSI(close_ltf, 12)
-    atr7_ltf = ta.ATR(high_ltf, low_ltf, close_ltf, 7)
+    ema50_ltf = ta.EMA(close_ltf, 10)
+    rsi25_ltf = ta.RSI(close_ltf, 25)
+    obv_ltf = ta.OBV(close_ltf, volume_ltf)
+    atr14_ltf = ta.ATR(high_ltf, low_ltf, close_ltf, 14)
+    mfi14_ltf = ta.MFI(high_ltf, low_ltf, close_ltf, volume_ltf, timeperiod=14)# volume + price pressure buyers / sales by the volume
+
     indicators_ltf = pd.DataFrame({
         'ema50': ema50_ltf,
-        'rsi12': rsi12_ltf,
-        'atr7': atr7_ltf,
+        'rsi25': rsi25_ltf,
+        'atr14': atr14_ltf,
+        'obv': obv_ltf,
+        'mfi': mfi14_ltf,
     })
 
     return indicators_htf, indicators_ltf
 
 
 if __name__ == "__main__":
-    data = CandlesData("BTCUSDT").get_trend_data()
-    trend_df = CandlesData("BTCUSDT").get_trend_data()
-    patterns_df = CandlesData("BTCUSDT").get_pattern_indicators_data()
+    data = CandlesData("SOLUSDT").get_trend_data()
+    trend_df = CandlesData("SOLUSDT").get_trend_data()
+    patterns_df = CandlesData("SOLUSDT").get_pattern_indicators_data()
 
     trend_indicators, pattern_indicators = find_indicators(trend_df, patterns_df)
 

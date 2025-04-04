@@ -19,8 +19,7 @@ class CandlesData:
         df = df.apply(pd.to_numeric, errors="coerce")  # все в числа
         df["datetime"] = pd.to_datetime(df["datetime"],
                                         unit="ms")  # крч меняем юникс время в нормальное и свечи запрашиваются в обратном порядке те от ближайшего к нам до самого позднего
-        df["quote_volume"] = df["quote_volume"].apply(
-            lambda x: f"{x / 1e6:.2f}M")  # ВЫВОД В МИЛЛИОНАХ А НЕ В ТУПОЙ EXP ** форме
+
         return df
     def fetch_candles(self, interval, limit):
         response = session.get_kline(
@@ -57,7 +56,7 @@ class CandlesData:
 
 
 if __name__ == "__main__": #точка входа
-    data = CandlesData("ETHUSDT")
+    data = CandlesData("SOLUSDT")
     for_pattern = data.get_pattern_indicators_data()
 
     for_trend = data.get_trend_data()
