@@ -1,3 +1,5 @@
+from numpy.ma.extras import average
+
 from calculate_indicators import find_indicators
 from Data_from_bybit.receive_bybit import CandlesData
 
@@ -107,7 +109,7 @@ def sl_tp(last, signal):
             last['ema50'] - atr_multiplier * last['atr7'],
             last['senkou_b'] if last['senkou_b'] < last['price'] else None
         ]
-        sl = min([x for x in sl_candidates if x is not None])
+        sl = max([x for x in sl_candidates if x is not None])
 
 
         tp = [last['price'] + m * last['atr7'] for m in tp_multipliers]
@@ -122,7 +124,7 @@ def sl_tp(last, signal):
             last['ema50'] + atr_multiplier * last['atr7'],
             last['senkou_b'] if last['senkou_b'] > last['price'] else None
         ]
-        sl = max([x for x in sl_candidates if x is not None])
+        sl = min([x for x in sl_candidates if x is not None])
 
         tp = [last['price'] - m * last['atr7'] for m in tp_multipliers]
         if last['senkou_a'] < last['price']:
