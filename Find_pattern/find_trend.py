@@ -1,5 +1,4 @@
-from numpy.ma.extras import average
-
+from find_patterns import generate_signal
 from calculate_indicators import find_indicators
 from Data_from_bybit.receive_bybit import CandlesData
 
@@ -53,44 +52,7 @@ def find_trend(trend_indicators, pattern_indicators, htf_df):
 
     return trend_direction, trend_strength, last
 
-# сигналы на вход через rsi, macd, price относитльно ema и ichimoku cloud
-def generate_signal(trend_direction, last):
-    signal = 'hold'
-    bull_trend = ["strong_bullish", "bullish"] #pep8
-    bear_trend = ["strong_bearish", "bearish"]
 
-    # доп условия для входа
-    macd_bull = last['macd'] > last['macd_signal']
-    macd_bear = last['macd'] < last['macd_signal']
-    price_above_cloud = last['price'] > max(last['senkou_a'], last['senkou_b'])
-    price_below_cloud = last['price'] < min(last['senkou_a'], last['senkou_b'])
-
-    # generate signal by using trading view system
-    if trend_direction in bull_trend:
-        # inspired trading view
-        conditions_count = [
-            last['price'] > last['ema50'],
-            last['rsi12'] > 30 and last['rsi12'] < 65,
-            macd_bull,
-            price_above_cloud,
-            last['tenkan'] > last['kijun']
-        ]
-        if sum(conditions_count) >= 4:  # Минимум 4 из 5 условий
-            signal = "buy"
-
-    elif trend_direction in bear_trend:
-        # inspired trading view
-        conditions_count = [
-            last['price'] < last['ema50'],
-            last['rsi25'] < 70 and last['rsi25'] > 35,
-            macd_bear,
-            price_below_cloud,
-            last['tenkan'] < last['kijun']
-        ]
-        if sum(conditions_count) >= 4:
-            signal = "sell"
-
-    return signal
 
 # sl tp через atr ema и ichimoku
 def sl_tp(last, signal):
