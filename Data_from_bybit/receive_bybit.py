@@ -11,6 +11,10 @@ class CandlesData:
         self.session = HTTP()
         self.symbol = symbol
         self.timeframes = {
+
+            '1m': 1,
+            '5m': 5,
+            '15m': 15,
             '4h': 240,
             '1d': 'D'
         }
