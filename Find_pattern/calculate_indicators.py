@@ -38,42 +38,47 @@ def find_indicators(highframe_df, lowframe_df):
     high_ltf = lowframe_df['high']
     close_ltf = lowframe_df["close"]
     low_ltf = lowframe_df["low"]
-    volume_ltf = lowframe_df["quote_volume"]
 
     sma150_htf = ta.SMA(close_htf, 150)
     adx_htf = ta.ADX(high_htf, low_htf, close_htf, 14)
-    # macd_line, macd_signal, macd_hist = ta.MACD(close, fastperiod=12, slowperiod=26, signalperiod=9)
+    plusdi_htf = ta.PLUS_DI(high_htf, low_htf, close_htf, 14)
+    minusdi_htf = ta.MINUS_DI(high_htf, low_htf, close_htf, 14)
     ichimoku_htf = calculate_ichimoku(highframe_df)
     indicators_htf = pd.DataFrame({
         'sma150': sma150_htf, # общий тренд
         'adx': adx_htf, # сила тренда
+        'plus_di': plusdi_htf,
+        'minus_di': minusdi_htf,
+
     })
     indicators_htf = pd.concat([indicators_htf, ichimoku_htf], axis=1)
     # module low timeframee
 
-    ema50_ltf = ta.EMA(close_ltf, 10)
-    rsi25_ltf = ta.RSI(close_ltf, 25)
-    obv_ltf = ta.OBV(close_ltf, volume_ltf)
-    atr14_ltf = ta.ATR(high_ltf, low_ltf, close_ltf, 14)
-    mfi14_ltf = ta.MFI(high_ltf, low_ltf, close_ltf, volume_ltf, timeperiod=14)# volume + price pressure buyers / sales by the volume
+    ema50_ltf = ta.EMA(close_ltf, 50)
 
+    rsi25_ltf = ta.RSI(close_ltf, 25)
+    rsi12_ltf = ta.RSI(close_ltf, 12)
+    macd_line, macd_signal, macd_hist = ta.MACD(close_ltf,12, 26, 9)
+    atr7_ltf = ta.ATR(high_ltf, low_ltf, close_ltf, 7)
     indicators_ltf = pd.DataFrame({
         'ema50': ema50_ltf,
+        'rsi12': rsi12_ltf,
         'rsi25': rsi25_ltf,
-        'atr14': atr14_ltf,
-        'obv': obv_ltf,
-        'mfi': mfi14_ltf,
+        'atr7': atr7_ltf,
+        'macd': macd_line,
+        'macd_signal': macd_signal,
     })
 
     return indicators_htf, indicators_ltf
 
 
 if __name__ == "__main__":
-    data = CandlesData("SOLUSDT").get_trend_data()
-    trend_df = CandlesData("SOLUSDT").get_trend_data()
-    patterns_df = CandlesData("SOLUSDT").get_pattern_indicators_data()
+    data = CandlesData("ETHUSDT").get_trend_data()
+    trend_df = CandlesData("ETHUSDT").get_trend_data()
+    patterns_df = CandlesData("ETHUSDT").get_pattern_indicators_data()
 
     trend_indicators, pattern_indicators = find_indicators(trend_df, patterns_df)
-
+    trend_indicators.to_csv("trend_indicators.csv")
+    pattern_indicators.to_csv("pattern_indicators.csv")
     print(trend_indicators)
     print(pattern_indicators)
