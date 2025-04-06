@@ -60,12 +60,15 @@ class CandlesData:
 
 
 if __name__ == "__main__": #точка входа
-    data = CandlesData("SOLUSDT")
+    symbol = input("Enter symbol: ")
+
+    data = CandlesData(symbol)
     for_pattern = data.get_pattern_indicators_data()
 
     for_trend = data.get_trend_data()
     print(for_trend)
     print(for_pattern)
+    print(for_trend.head(10))
     data.candles_csv(for_pattern, df_name="for_pattern",timeframe="4h")
 
 

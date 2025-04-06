@@ -96,9 +96,9 @@ def sl_tp(last, signal):
 
 
 if __name__ == "__main__":
-
-        trend = CandlesData("SOLUSDT").get_trend_data()
-        pattern = CandlesData("SOLUSDT").get_pattern_indicators_data()
+        symbol = input("Enter symbol: ")
+        trend = CandlesData(symbol).get_trend_data()
+        pattern = CandlesData(symbol).get_pattern_indicators_data()
         trend_indicators, pattern_indicators = find_indicators(trend, pattern)
 
         trend_direction, trend_strength, last = find_trend(trend_indicators, pattern_indicators, trend)

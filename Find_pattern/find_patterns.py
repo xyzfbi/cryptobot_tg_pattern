@@ -1,64 +1,62 @@
 import talib
+import pandas as pd
 from Data_from_bybit.receive_bybit import CandlesData
 from patterns_config import candlestick_patterns, candle_rankings
 
-def check_empty(df):
-    return df.empty
-def check_candles_patterns(data_df, lookback_period = 100):
-    patterns_data = []
+"""
+пары таймфреймов и свечи
+    1. m1 = 75
+    1. M5 = 40
+    
+    2. M15 = 25
+    2. H1 = 18
+    
+    3. H4 = 13
+    3. D1 = 8
+"""
+
+def find_patterns(data_df, lookback_period = 5):
+
+    if data_df.empty or len(data_df) < lookback_period:
+        print("insufficient data")
+        return
+
+
+    result = []
+
     for pattern in candlestick_patterns.keys():
         pattern_func = getattr(talib, pattern)
-        results = pattern_func(data_df['open'], data_df['high'], data_df['low'], data_df['close']) # поиск паттернов по всему периоду страшего фрейма
-        recent_results = results.tail(lookback_period) # поиск паттернов в последних n свечах
-        if check_empty(recent_results):
-            return False
-        else:
-            pass
-check_candles_patterns(CandlesData("BTCUSDT").get_trend_data())
+        patterns_results = pattern_func(data_df['open'],
+                                        data_df['high'],
+                                        data_df['low'],
+                                        data_df['close']
+                                        )
+        '''print(patterns_results)
+        print(patterns_results)
+        print(type(patterns_results))
+        print(patterns_results.columns)'''
 
-'''
-import pandas as pd
+        for i in data_df.head(lookback_period).index: # перебираем крч по исхожному индексу
+            if patterns_results.iloc[i] != 0:
+                candle_num = i
+                datetime_candle = data_df.loc[i, 'datetime']
+                direction = "bullish" if patterns_results.iloc[i] > 0 else "bearish" # это функция возвращает
+                weight = candle_rankings.get(f"{pattern}_Bull" if direction == "bullish" else f"{pattern}_Bear",0 ) # это конфиг смотрит ранги
+                value = patterns_results.iloc[i] # это просто возвраащет значение талибовской функции
+                # print(candle_num, pattern, direction, weight, value)
 
-def check_recent_patterns(df, lookback=3):
-    """
-    Проверяет последние N свечей на наличие свечных паттернов.
-    Возвращает DataFrame с колонками:
-    - pattern_name: название паттерна
-    - direction: bullish/bearish
-    - count: сколько раз появился в lookback-периоде
-    - last_signal: значение последнего сигнала (>0 = bullish, <0 = bearish)
-    - ranking: сила паттерна (если используется candle_rankings)
-    """
-    patterns_data = []
-    
-    for pattern in candlestick_patterns.keys():
-        pattern_func = getattr(talib, pattern)
-        results = pattern_func(df['open'], df['high'], df['low'], df['close'])
-        recent_results = results.tail(lookback)
-        pattern_count = sum(recent_results != 0)
-        
-        if pattern_count > 0:
-            direction = "bullish" if recent_results.iloc[-1] > 0 else "bearish"
-            pattern_name = candlestick_patterns[pattern]
-            
-            # Добавляем ранг паттерна (если доступен candle_rankings)
-            ranking = candle_rankings.get(f"{pattern}_Bull" if direction == "bullish" else f"{pattern}_Bear", 0)
-            
-            patterns_data.append({
-                "pattern_name": pattern_name,
-                "direction": direction,
-                "count": pattern_count,
-                "last_signal": recent_results.iloc[-1],
-                "ranking": ranking  # Для сортировки по силе паттерна
-            })
-    
-    # Создаем DataFrame и сортируем по рангу (чем меньше ranking, тем сильнее паттерн)
-    patterns_df = pd.DataFrame(patterns_data)
-    if not patterns_df.empty:
-        patterns_df.sort_values(by="ranking", ascending=True, inplace=True)
-    
-    return patterns_df'''
+                result.append({
+                    'candle_num': candle_num,
+                    'datetime': datetime_candle,
+                    'direction': direction,
+                    'pattern': pattern, # имя паттерна
+                    'value': value, # bullish / bearish возвращает функция талиб
+                    'weight': weight # вес по #https://thepatternsite.com/
+                })
 
+    # result_df = pd.DataFrame(result).sort_values(['weight'], ascending=[False])
+    result_df = pd.DataFrame(result)
+    return result_df
 
 
 # сигналы на вход через rsi, macd, price относитльно ema и ichimoku cloud
@@ -99,3 +97,10 @@ def generate_signal(trend_direction, last):
             signal = "sell"
 
     return signal
+
+if __name__ == "__main__":
+    symbol = input("Enter symbol: ")
+    df = CandlesData(symbol).get_trend_data()
+    print(find_patterns(df, 7))
+    df_ltf = CandlesData(symbol).get_pattern_indicators_data()
+    print(find_patterns(df_ltf, 13))
