@@ -11,6 +11,10 @@ class CandlesData:
         self.session = HTTP()
         self.symbol = symbol
         self.timeframes = {
+
+            '1m': 1,
+            '5m': 5,
+            '15m': 15,
             '4h': 240,
             '1d': 'D'
         }
@@ -19,8 +23,7 @@ class CandlesData:
         df = df.apply(pd.to_numeric, errors="coerce")  # все в числа
         df["datetime"] = pd.to_datetime(df["datetime"],
                                         unit="ms")  # крч меняем юникс время в нормальное и свечи запрашиваются в обратном порядке те от ближайшего к нам до самого позднего
-        df["quote_volume"] = df["quote_volume"].apply(
-            lambda x: f"{x / 1e6:.2f}M")  # ВЫВОД В МИЛЛИОНАХ А НЕ В ТУПОЙ EXP ** форме
+
         return df
     def fetch_candles(self, interval, limit):
         response = session.get_kline(
@@ -44,10 +47,10 @@ class CandlesData:
         )
         return self.normalize_df(df)
 
-    def get_pattern_indicators_data(self, candles_count=30, timeframe='4h'):
+    def get_pattern_indicators_data(self, candles_count=50, timeframe='4h'):
         return self.fetch_candles(self.timeframes[timeframe], candles_count)
 
-    def get_trend_data(self, candles_count=80, timeframe='1d'):
+    def get_trend_data(self, candles_count=150, timeframe='1d'):
         return self.fetch_candles(self.timeframes[timeframe], candles_count)
 
     def candles_csv(self, df, timeframe, df_name):
@@ -57,12 +60,16 @@ class CandlesData:
 
 
 if __name__ == "__main__": #точка входа
-    data = CandlesData("ETHUSDT")
+    symbol = input("Enter symbol: ")
+    symbol = symbol.upper()
+
+    data = CandlesData(symbol)
     for_pattern = data.get_pattern_indicators_data()
 
     for_trend = data.get_trend_data()
     print(for_trend)
     print(for_pattern)
+    print(for_trend.head(10))
     data.candles_csv(for_pattern, df_name="for_pattern",timeframe="4h")
 
 
