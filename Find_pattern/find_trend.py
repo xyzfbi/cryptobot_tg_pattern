@@ -97,6 +97,8 @@ def sl_tp(last, signal):
 
 if __name__ == "__main__":
         symbol = input("Enter symbol: ")
+        symbol = symbol.upper()
+
         trend = CandlesData(symbol).get_trend_data()
         pattern = CandlesData(symbol).get_pattern_indicators_data()
         trend_indicators, pattern_indicators = find_indicators(trend, pattern)

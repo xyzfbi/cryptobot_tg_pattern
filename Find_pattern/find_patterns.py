@@ -141,6 +141,7 @@ def generate_signal(trend_direction, last, confirmed_patterns):
 
 if __name__ == "__main__":
     symbol = input("Enter symbol: ")
+    symbol = symbol.upper()
     df_htf = CandlesData(symbol).get_trend_data()
     df_ltf = CandlesData(symbol).get_pattern_indicators_data()
     print(df_htf.head())

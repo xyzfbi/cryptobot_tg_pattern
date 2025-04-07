@@ -61,6 +61,7 @@ class CandlesData:
 
 if __name__ == "__main__": #точка входа
     symbol = input("Enter symbol: ")
+    symbol = symbol.upper()
 
     data = CandlesData(symbol)
     for_pattern = data.get_pattern_indicators_data()
