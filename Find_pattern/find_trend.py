@@ -1,4 +1,4 @@
-from find_patterns import generate_signal
+from Find_pattern.find_patterns import generate_signal, confirm_patterns
 from calculate_indicators import find_indicators
 from Data_from_bybit.receive_bybit import CandlesData
 
@@ -93,7 +93,7 @@ def sl_tp(last, signal):
             tp.append(last['senkou_a'])
 
     return sl, [x for x in tp if x is not None]
-
+# sl tp надо немного под паттерны переделать
 
 if __name__ == "__main__":
         symbol = input("Enter symbol: ")
@@ -102,7 +102,8 @@ if __name__ == "__main__":
         trend_indicators, pattern_indicators = find_indicators(trend, pattern)
 
         trend_direction, trend_strength, last = find_trend(trend_indicators, pattern_indicators, trend)
-        sign = generate_signal(trend_direction, last)
+        confirmed_patterns = confirm_patterns(trend, pattern)
+        sign = generate_signal(trend_direction, last, confirmed_patterns)
         stop, take = sl_tp(last, sign)
 
         print("price:", last['price'])
