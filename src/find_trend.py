@@ -1,6 +1,6 @@
-from Find_pattern.find_patterns import generate_signal, confirm_patterns
+from find_patterns import generate_signal, confirm_patterns
 from calculate_indicators import find_indicators
-from Data_from_bybit.receive_bybit import CandlesData
+from src.receive_bybit import CandlesData
 
 
 def find_trend(trend_indicators, pattern_indicators, htf_df):

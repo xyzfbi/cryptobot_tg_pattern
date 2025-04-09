@@ -1,4 +1,4 @@
-from Data_from_bybit.receive_bybit import CandlesData
+from receive_bybit import CandlesData
 import pandas as pd
 import talib as ta
 

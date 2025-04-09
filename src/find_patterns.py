@@ -1,6 +1,6 @@
 import talib
 import pandas as pd
-from Data_from_bybit.receive_bybit import CandlesData
+from receive_bybit import CandlesData
 from patterns_config import candlestick_patterns, candle_rankings
 
 """
