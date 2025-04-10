@@ -73,12 +73,14 @@ def find_indicators(highframe_df, lowframe_df):
 
 
 if __name__ == "__main__":
-    data = CandlesData("ETHUSDT").get_trend_data()
-    trend_df = CandlesData("ETHUSDT").get_trend_data()
-    patterns_df = CandlesData("ETHUSDT").get_pattern_indicators_data()
+    symbol = input("Enter symbol: ")
+    symbol = symbol.upper()
+    data = CandlesData(symbol).get_trend_data()
+    trend_df = CandlesData(symbol).get_trend_data()
+    patterns_df = CandlesData(symbol).get_pattern_indicators_data()
 
     trend_indicators, pattern_indicators = find_indicators(trend_df, patterns_df)
-    trend_indicators.to_csv("trend_indicators.csv")
-    pattern_indicators.to_csv("pattern_indicators.csv")
+    trend_indicators.to_csv("data/trend_indicators.csv")
+    pattern_indicators.to_csv("data/pattern_indicators.csv")
     print(trend_indicators)
     print(pattern_indicators)

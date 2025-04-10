@@ -54,7 +54,7 @@ class CandlesData:
         return self.fetch_candles(self.timeframes[timeframe], candles_count)
 
     def candles_csv(self, df, timeframe, df_name):
-        filename = f"{self.symbol}_{df_name}_{timeframe}.csv"
+        filename = f"data/{self.symbol}_{df_name}_{timeframe}.csv"
         df.to_csv(filename, index=False)
         return filename
 
