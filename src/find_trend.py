@@ -1,6 +1,6 @@
 from find_patterns import generate_signal, confirm_patterns
 from calculate_indicators import find_indicators
-from src.receive_bybit import CandlesData
+from receive_bybit import CandlesData
 
 
 def find_trend(trend_indicators, pattern_indicators, htf_df):
@@ -94,6 +94,18 @@ def sl_tp(last, signal):
 
     return sl, [x for x in tp if x is not None]
 # sl tp надо немного под паттерны переделать
+
+
+def return_signal(symbol):
+    trend = CandlesData(symbol).get_trend_data()
+    pattern = CandlesData(symbol).get_pattern_indicators_data()
+    trend_indicators, pattern_indicators = find_indicators(trend, pattern)
+
+    trend_direction, trend_strength, last = find_trend(trend_indicators, pattern_indicators, trend)
+    confirmed_patterns = confirm_patterns(trend, pattern)
+    sign = generate_signal(trend_direction, last, confirmed_patterns)
+
+    return sign
 
 if __name__ == "__main__":
         symbol = input("Enter symbol: ")

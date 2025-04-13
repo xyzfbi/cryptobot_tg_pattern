@@ -139,6 +139,8 @@ def generate_signal(trend_direction, last, confirmed_patterns):
 
     return signal
 
+
+
 if __name__ == "__main__":
     symbol = input("Enter symbol: ")
     symbol = symbol.upper()
