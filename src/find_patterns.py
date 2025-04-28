@@ -15,7 +15,7 @@ from patterns_config import candlestick_patterns, candle_rankings
     3. D1 = 8
 """
 
-def find_patterns(data_df, lookback_period = 5):
+def find_patterns(data_df, lookback_period = 15):
 
     if data_df.empty or len(data_df) < lookback_period:
         print("insufficient data")
@@ -60,8 +60,8 @@ def find_patterns(data_df, lookback_period = 5):
 # функция подтверэжения паттернов младшего таймфрейма с паттернами старшего optimized
 def confirm_patterns(data_htf, data_ltf):
     confirmed_patterns = []
-    patterns_ltf = find_patterns(data_ltf, lookback_period = 13)
-    patterns_htf = find_patterns(data_htf, lookback_period = 13)
+    patterns_ltf = find_patterns(data_ltf, lookback_period = 15)
+    patterns_htf = find_patterns(data_htf, lookback_period = 15)
 
     for _, row_ltf in patterns_ltf.iterrows():
         confirmed = False

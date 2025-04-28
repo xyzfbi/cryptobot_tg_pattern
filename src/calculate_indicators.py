@@ -2,6 +2,7 @@ from receive_bybit import CandlesData
 import pandas as pd
 import talib as ta
 
+# calculate ichimoku   !!!!
 def calculate_ichimoku(df, tenkan_num = 9,  kijun_period = 26, senkou_period = 52):
     result_df = pd.DataFrame()
 
@@ -29,7 +30,9 @@ def calculate_ichimoku(df, tenkan_num = 9,  kijun_period = 26, senkou_period = 5
 
     return result_df
 
+# вычисление всех нужных индикаторов
 def find_indicators(highframe_df, lowframe_df):
+
     # module high time frame
     high_htf = highframe_df['high']
     close_htf = highframe_df["close"]
@@ -44,6 +47,9 @@ def find_indicators(highframe_df, lowframe_df):
     plusdi_htf = ta.PLUS_DI(high_htf, low_htf, close_htf, 14)
     minusdi_htf = ta.MINUS_DI(high_htf, low_htf, close_htf, 14)
     ichimoku_htf = calculate_ichimoku(highframe_df)
+
+    # form indicators HIGH timeframe
+
     indicators_htf = pd.DataFrame({
         'sma150': sma150_htf, # общий тренд
         'adx': adx_htf, # сила тренда
@@ -52,14 +58,17 @@ def find_indicators(highframe_df, lowframe_df):
 
     })
     indicators_htf = pd.concat([indicators_htf, ichimoku_htf], axis=1)
+
     # module low timeframee
 
     ema50_ltf = ta.EMA(close_ltf, 50)
 
-    rsi25_ltf = ta.RSI(close_ltf, 25)
-    rsi12_ltf = ta.RSI(close_ltf, 12)
-    macd_line, macd_signal, macd_hist = ta.MACD(close_ltf,12, 26, 9)
-    atr7_ltf = ta.ATR(high_ltf, low_ltf, close_ltf, 7)
+    rsi25_ltf = ta.RSI(close_ltf, 25) # RSI 25 CANDLES
+    rsi12_ltf = ta.RSI(close_ltf, 12) #RSI 12 CANDLES
+    macd_line, macd_signal, macd_hist = ta.MACD(close_ltf,12, 26, 9) #MACD
+    atr7_ltf = ta.ATR(high_ltf, low_ltf, close_ltf, 7) # ATR 7 CANDLES
+
+    # form indicators LOW timeframe
     indicators_ltf = pd.DataFrame({
         'ema50': ema50_ltf,
         'rsi12': rsi12_ltf,
@@ -71,7 +80,7 @@ def find_indicators(highframe_df, lowframe_df):
 
     return indicators_htf, indicators_ltf
 
-
+# testing
 if __name__ == "__main__":
     symbol = input("Enter symbol: ")
     symbol = symbol.upper()

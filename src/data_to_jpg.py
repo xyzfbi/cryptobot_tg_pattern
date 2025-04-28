@@ -1,12 +1,12 @@
+import requests
+
 from receive_bybit import CandlesData
 import matplotlib.pyplot as plt
-import pandas as pd
 from mplfinance.original_flavor import candlestick_ohlc
 import matplotlib.dates as mdates
 import matplotlib.ticker as mticker
-from matplotlib import  font_manager as fm, rcParams
-from find_trend import return_signal
-
+from matplotlib import  font_manager as fm
+from find_trend import TradingStrategy
 
 def depict_candle_graph(data, symbol="BTCUSDT"):
     data = data.head(20)
@@ -20,16 +20,8 @@ def depict_candle_graph(data, symbol="BTCUSDT"):
     print(data_ohlc)
 
     #шрифт
+    prop = fm.FontProperties(family='DejaVu Sans', weight='bold')
 
-    '''
-    github_url = 'https://github.com/google/fonts/blob/main/apache/robotoslab/RobotoSlab%5Bwght%5D.ttf'
-    font_url = github_url + '?raw=true'
-    response = requests.get(font_url)
-    with open('temp.ttf', 'wb') as f:
-        f.write(response.content)
-    f.close()
-    '''
-    prop = fm.FontProperties(fname='fonts/Arimo-VariableFont_wght.ttf')
     #создание фигуры
     fig, ax = plt.subplots(figsize=(15, 7))
     ax.set_facecolor('#101014')
@@ -70,7 +62,11 @@ def depict_candle_graph(data, symbol="BTCUSDT"):
     #цвет фона
     fig.patch.set_facecolor('#101014')
 
-    signal = return_signal(symbol)
+    strategy = TradingStrategy(symbol)
+
+    signal = strategy.return_signal()
+    sl_level = strategy.sl
+    tp_levels = strategy.tp
 
     
     # Получаем диапазон Y
@@ -96,6 +92,34 @@ def depict_candle_graph(data, symbol="BTCUSDT"):
                 color=color)
     
         ax.text(arrow_x, arrow_y - y_range * 0.25, f'{signal.upper()} Signal', fontsize=15, color='green', ha='left', fontweight = 'bold', fontproperties = prop)
+        if signal == 'buy':
+            sl_line_color = 'red'
+            tp_line_color = 'green'
+        elif signal == 'sell':
+            sl_line_color = 'red'
+            tp_line_color = 'green'
+
+        ax.axhline(y=sl_level, color=sl_line_color, linestyle='--', linewidth=2)
+        ax.text(
+            data_ohlc['datetime'].iloc[0],
+            sl_level,
+            f"SL: {sl_level:.2f}",
+            color=sl_line_color,
+            fontweight='bold',
+            fontproperties=prop,
+            va='bottom' if signal == 'buy' else 'top'
+        )
+        for i, tp in enumerate(tp_levels):
+            ax.axhline(y=tp, color=tp_line_color, linestyle='--', linewidth=2)
+            ax.text(
+                data_ohlc['datetime'].iloc[0],
+                tp,
+                f"TP: {tp:.2f}",
+                color=tp_line_color,
+                fontweight='bold',
+                fontproperties=prop,
+                va='bottom' if signal == 'buy' else 'top'
+            )
     else:
         color='grey'
         ax.annotate('', 
@@ -105,13 +129,29 @@ def depict_candle_graph(data, symbol="BTCUSDT"):
                 fontsize=12, 
                 color=color)
     
-        ax.text(arrow_x, arrow_y - y_range * 0.25, f'{' '.join(signal.upper().split('_'))} Signal', fontsize=15, color=color, ha='left', fontweight = 'bold', fontproperties = prop)
+        ax.text(arrow_x,
+                arrow_y - y_range * 0.25,
+                f'{' '.join(signal.upper().split('_'))} Signal',
+                fontsize=15, color=color,
+                ha='left',
+                fontweight = 'bold',
+                fontproperties = prop
+                )
+
 
 
     plt.tight_layout()
     plt.show()
 
 
+class DepictCandleGraph:
+    def __init__(self, candle_data):
+        self.candle_data = candle_data
+    @staticmethod
+    def depict_candle_white(self):
+        pass
+    def depict_candle_black(self, symbol="BTCUSDT"):
+        pass
 
 
 if __name__ == "__main__":
