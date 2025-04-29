@@ -1,6 +1,6 @@
-from aiogram import Bot, Router, types, Dispatcher
+from aiogram import Bot, Router, Dispatcher
 from aiogram.filters import Command
-from aiogram.types import Message, InputFile, FSInputFile
+from aiogram.types import Message, FSInputFile
 from dotenv import load_dotenv
 import asyncio
 import os
@@ -9,7 +9,16 @@ import keyboard as kb
 import src.receive_bybit as rcv_bybit
 import src.find_trend as find_trend
 import src.data_to_jpg as graph
-from ыаывпы import next_tf
+import csv
+
+def load_valid_coins(csv_path="coins.csv"):
+    coins = set()
+    with open(csv_path, newline="", encoding="utf-8") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            coin = row["symbol"].strip().upper()
+            coins.add(coin)
+    return coins
 
 load_dotenv()  # енв файлик
 TOKEN = os.getenv("API_KEY")
@@ -18,11 +27,12 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN)
 router = Router()  # a router
 
-VALID_COINS = rcv_bybit.get_available_coins()
+VALID_COINS = load_valid_coins()
 user_states = {}
 user_data = {}
 STATE_IDLE = "idle"
 STATE_WAITING_COIN = "waiting_coin"
+
 
 @router.message(Command(commands="start"))
 async def send_welcome(message: Message):
