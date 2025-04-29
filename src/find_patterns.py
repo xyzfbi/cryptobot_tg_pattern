@@ -1,7 +1,7 @@
 import talib
 import pandas as pd
-from receive_bybit import CandlesData
-from patterns_config import candlestick_patterns, candle_rankings
+from src.receive_bybit import CandlesData
+from src.patterns_config import candlestick_patterns, candle_rankings
 
 """
 пары таймфреймов и свечи

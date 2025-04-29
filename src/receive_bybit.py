@@ -4,6 +4,13 @@ from pybit.unified_trading import HTTP
 session = HTTP()
 
 
+def get_available_coins():
+    response = session.get_instruments_info(category="spot")
+
+    symbols = response["result"]["list"]
+    coins = (symbol["baseCoin"] for symbol in symbols)
+
+    return coins
 
 
 class CandlesData:
@@ -11,12 +18,10 @@ class CandlesData:
         self.session = HTTP()
         self.symbol = symbol
         self.timeframes = {
-
-            '1m': 1,
-            '5m': 5,
-            '15m': 15,
-            '4h': 240,
-            '1d': 'D'
+            '15 minutes': 15,
+            '1 hour': 60,
+            '4 hours': 240,
+            '1 day': 'D'
         }
     @staticmethod
     def normalize_df(df):
@@ -47,11 +52,11 @@ class CandlesData:
         )
         return self.normalize_df(df)
 
-    def get_pattern_indicators_data(self, candles_count=50, timeframe='4h'):
-        return self.fetch_candles(self.timeframes[timeframe], candles_count)
+    def get_pattern_indicators_data(self, candles_count=50, timeframe=15):
+        return self.fetch_candles(timeframe, candles_count)
 
-    def get_trend_data(self, candles_count=150, timeframe='1d'):
-        return self.fetch_candles(self.timeframes[timeframe], candles_count)
+    def get_trend_data(self, candles_count=150, timeframe=60):
+        return self.fetch_candles(timeframe, candles_count)
 
     def candles_csv(self, df, timeframe, df_name):
         filename = f"data/{self.symbol}_{df_name}_{timeframe}.csv"

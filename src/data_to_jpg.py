@@ -1,14 +1,14 @@
 import requests
 
-from receive_bybit import CandlesData
+from src.receive_bybit import CandlesData
 import matplotlib.pyplot as plt
 from mplfinance.original_flavor import candlestick_ohlc
 import matplotlib.dates as mdates
 import matplotlib.ticker as mticker
 from matplotlib import  font_manager as fm
-from find_trend import TradingStrategy
-
-def depict_candle_graph(data, symbol="BTCUSDT"):
+from src.find_trend import TradingStrategy
+import io
+def depict_candle_graph(data, symbol="BTCUSDT", l_tf=15, h_tf = 60):
     data = data.head(20)
 
     #преобразование в формат матплотлиба
@@ -62,7 +62,7 @@ def depict_candle_graph(data, symbol="BTCUSDT"):
     #цвет фона
     fig.patch.set_facecolor('#101014')
 
-    strategy = TradingStrategy(symbol)
+    strategy = TradingStrategy(symbol, l_tf, h_tf)
 
     signal = strategy.return_signal()
     sl_level = strategy.sl
@@ -139,9 +139,12 @@ def depict_candle_graph(data, symbol="BTCUSDT"):
                 )
 
 
-
     plt.tight_layout()
-    plt.show()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='jpg')
+    buf.seek(0)
+    plt.close(fig)
+    return buf
 
 
 class DepictCandleGraph:
