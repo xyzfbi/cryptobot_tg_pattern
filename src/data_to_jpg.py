@@ -1,3 +1,5 @@
+import os
+
 import requests
 
 from src.receive_bybit import CandlesData
@@ -140,11 +142,8 @@ def depict_candle_graph(data, symbol="BTCUSDT", l_tf=15, h_tf = 60):
 
 
     plt.tight_layout()
-    buf = io.BytesIO()
-    plt.savefig(buf, format='jpg')
-    buf.seek(0)
-    plt.close(fig)
-    return buf
+    path = '../tgbot/buf.jpg'
+    plt.savefig(path)
 
 
 class DepictCandleGraph:
@@ -159,9 +158,8 @@ class DepictCandleGraph:
 
 if __name__ == "__main__":
     symbol = input("Input symbol: ").upper()
-    data = CandlesData(symbol).get_trend_data()
-    depict_candle_graph(data, symbol)
-
+    data_df = CandlesData(symbol).get_trend_data(timeframe='D')
+    depict_candle_graph(data_df, symbol, 240, 'D')
 
 
 

@@ -142,5 +142,6 @@ class TradingStrategy:
 
 if __name__ == "__main__":
         symbol = input("Enter symbol: ")
-        strategy = TradingStrategy(symbol, '4 hours', '1 day')
+        strategy = TradingStrategy(symbol, 240, 'D')
+        print(strategy.trend_data)
         strategy.return_signal()

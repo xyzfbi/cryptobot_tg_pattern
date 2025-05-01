@@ -1,6 +1,6 @@
 from aiogram import Bot, Router, Dispatcher
 from aiogram.filters import Command
-from aiogram.types import Message, FSInputFile
+from aiogram.types import Message, BufferedInputFile, FSInputFile
 from dotenv import load_dotenv
 import asyncio
 import os
@@ -9,16 +9,6 @@ import keyboard as kb
 import src.receive_bybit as rcv_bybit
 import src.find_trend as find_trend
 import src.data_to_jpg as graph
-import csv
-
-def load_valid_coins(csv_path="coins.csv"):
-    coins = set()
-    with open(csv_path, newline="", encoding="utf-8") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            coin = row["symbol"].strip().upper()
-            coins.add(coin)
-    return coins
 
 load_dotenv()  # енв файлик
 TOKEN = os.getenv("API_KEY")
@@ -27,12 +17,12 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN)
 router = Router()  # a router
 
-VALID_COINS = load_valid_coins()
+VALID_COINS = rcv_bybit.get_available_coins()
+
 user_states = {}
 user_data = {}
 STATE_IDLE = "idle"
 STATE_WAITING_COIN = "waiting_coin"
-
 
 @router.message(Command(commands="start"))
 async def send_welcome(message: Message):
@@ -122,16 +112,22 @@ async def handle_message(message: Message):
         await message.answer("Analyzing your coin", reply_markup=None)
 
         result_obj, current_timeframe, next_timeframe = analyzer(symbol, timeframe)
-
+        '''
+        print(current_timeframe)
+        print(next_timeframe)
+        '''
         data_obj = rcv_bybit.CandlesData(symbol)
-        for_jpg_data = data_obj.get_pattern_indicators_data(timeframe=current_timeframe)
+        for_jpg_data = data_obj.get_trend_data(timeframe=next_timeframe)
 
-        buf_jpg = graph.depict_candle_graph(for_jpg_data, l_tf=current_timeframe, h_tf=next_timeframe)
+        graph.depict_candle_graph(data=for_jpg_data, symbol=symbol,l_tf=current_timeframe, h_tf=next_timeframe)
 
-
+        path = "buf.jpg"
         result_text = result_obj.get_res_text()
-        await message.answer_photo(photo=FSInputFile(buf_jpg, filename="graph.jpg"),caption= result_text, reply_markup=kb.get_main_keyboard())
 
+        await message.answer_photo(
+            photo=FSInputFile(path),
+            caption=result_text,
+            reply_markup=kb.get_main_keyboard())
     else:
         await message.answer("Please use the menu buttons.", reply_markup=kb.get_main_keyboard())
 
@@ -140,7 +136,7 @@ async def main():
     dp.include_router(router)
 
     try:
-        await dp.start_polling(bot)
+        await dp.start_polling(bot, timeout_sec=120)
     finally:
         await bot.session.close()
 
