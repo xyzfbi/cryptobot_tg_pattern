@@ -4,10 +4,10 @@ from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, R
 
 def get_main_keyboard():
     keyboard = ReplyKeyboardMarkup(keyboard=[
-        [KeyboardButton(text="Timeframe"), ],
-        [KeyboardButton(text="Choose coin")],
-        [KeyboardButton(text="Analyze")],
-        [KeyboardButton(text="Help")],
+        [KeyboardButton(text="Timeframe ⏳"), ],
+        [KeyboardButton(text="Choose coin 🪙")],
+        [KeyboardButton(text="Analyze 👀")],
+        [KeyboardButton(text="Help 🚑")],
     ], resize_keyboard=True , one_time_keyboard=False)
 
     return keyboard

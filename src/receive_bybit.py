@@ -8,9 +8,9 @@ def get_available_coins():
     response = session.get_instruments_info(category="spot")
 
     symbols = response["result"]["list"]
-    coins = (symbol["baseCoin"] for symbol in symbols)
+    coins = {symbol["baseCoin"] for symbol in symbols}
 
-    return coins
+    return list(coins)
 
 
 class CandlesData:

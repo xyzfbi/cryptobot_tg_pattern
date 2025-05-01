@@ -32,14 +32,14 @@ async def send_welcome(message: Message):
     keyboard = kb.get_main_keyboard()
     user_name = message.from_user.username
     welcome_text = (f"Hi, @{user_name}!"
-                        f"\n\nI am a bot for analyzing cryptocurrency movements using patterns and technical analysis😎!"
+                        f"\n\nI am a 🤖 for analyzing cryptocurrency movements using patterns and technical analysis!"
                         f"\n\nAvailable commands: /start, /help"
-                        f"\nPlease choose one of the following commands by the keyboard below"
-                        f"\n\nMade by HSE students.")
+                        f"\nPlease choose one of the following commands by the keyboard below ⬇️"
+                        f"\n\nMade by HSE students. 🇷🇺")
 
     await message.reply(welcome_text, reply_markup=keyboard)
 
-@router.message(lambda message: message.text.strip().lower() in ["help", "/help"])
+@router.message(lambda message: message.text.strip().lower() in ["Help 🚑", "/help"])
 async def send_help(message: Message):
     keyboard = kb.get_main_keyboard()
     help_text =("Instruction for using our bot: \n\n"
@@ -81,14 +81,15 @@ async def handle_message(message: Message):
     if user_states.get(user_id, STATE_IDLE) == STATE_WAITING_COIN:
         coin = text.upper()
         if coin in VALID_COINS:
-            user_data[user_id]["symbol"] = coin + "USDT"
-            await message.answer("Coin selected", reply_markup=kb.get_main_keyboard())
+            user_data[user_id]["symbol"] = coin if coin.endswith("USDT") else f"{coin}USDT"
+            premium_emoji_id = "ma5dxheeuemdidbrmm8"
+            await message.answer(f"Coin selected💲", reply_markup=kb.get_main_keyboard(), parse_mode="HTML")
         else:
-            await message.answer("Entered nonexistent coin")
+            await message.answer("Entered nonexistent coin ❌")
         user_states[user_id] = STATE_IDLE
         return
 
-    if text == "Timeframe":
+    if text == "Timeframe ⏳":
 
         await message.answer("Choose timeframe:", reply_markup=kb.get_timeframe_keyboard())
 
@@ -96,12 +97,12 @@ async def handle_message(message: Message):
         user_data[user_id]["timeframe"] = text
         await message.answer(f"Selected timeframe - {text}", reply_markup=kb.get_main_keyboard())
 
-    elif text == "Choose coin":
+    elif text == "Choose coin 🪙":
 
         user_states[user_id] = STATE_WAITING_COIN
         await message.answer("Enter coin name", reply_markup=None)
 
-    elif text == "Analyze":
+    elif text == "Analyze 👀":
         symbol = user_data[user_id].get("symbol")
         timeframe = user_data[user_id].get("timeframe")
         if not symbol or not timeframe:
