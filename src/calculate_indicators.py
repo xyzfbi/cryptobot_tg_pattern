@@ -2,17 +2,18 @@ from src.receive_bybit import CandlesData
 import pandas as pd
 import talib as ta
 
+
 # calculate ichimoku   !!!!
-def calculate_ichimoku(df, tenkan_num = 9,  kijun_period = 26, senkou_period = 52):
+def calculate_ichimoku(df, tenkan_num=9, kijun_period=26, senkou_period=52):
     result_df = pd.DataFrame()
 
     tenkan_high = df['high'].rolling(tenkan_num).max()
     tenkan_low = df['low'].rolling(tenkan_num).min()
-    result_df['tenkan_sen'] = (tenkan_high + tenkan_low)/2
+    result_df['tenkan_sen'] = (tenkan_high + tenkan_low) / 2
 
     kijun_high = df['high'].rolling(kijun_period).max()
     kijun_low = df['low'].rolling(kijun_period).min()
-    result_df['kijun_sen'] = (kijun_high + kijun_low)/2
+    result_df['kijun_sen'] = (kijun_high + kijun_low) / 2
 
     result_df['senkou_span_a'] = ((result_df['tenkan_sen'] + result_df['kijun_sen']) / 2).shift(kijun_period)
 
@@ -30,9 +31,9 @@ def calculate_ichimoku(df, tenkan_num = 9,  kijun_period = 26, senkou_period = 5
 
     return result_df
 
+
 # вычисление всех нужных индикаторов
 def find_indicators(highframe_df, lowframe_df):
-
     # module high time frame
     high_htf = highframe_df['high']
     close_htf = highframe_df["close"]
@@ -51,8 +52,8 @@ def find_indicators(highframe_df, lowframe_df):
     # form indicators HIGH timeframe
 
     indicators_htf = pd.DataFrame({
-        'sma150': sma150_htf, # общий тренд
-        'adx': adx_htf, # сила тренда
+        'sma150': sma150_htf,  # общий тренд
+        'adx': adx_htf,  # сила тренда
         'plus_di': plusdi_htf,
         'minus_di': minusdi_htf,
 
@@ -63,10 +64,10 @@ def find_indicators(highframe_df, lowframe_df):
 
     ema50_ltf = ta.EMA(close_ltf, 50)
 
-    rsi25_ltf = ta.RSI(close_ltf, 25) # RSI 25 CANDLES
-    rsi12_ltf = ta.RSI(close_ltf, 12) #RSI 12 CANDLES
-    macd_line, macd_signal, macd_hist = ta.MACD(close_ltf,12, 26, 9) #MACD
-    atr7_ltf = ta.ATR(high_ltf, low_ltf, close_ltf, 7) # ATR 7 CANDLES
+    rsi25_ltf = ta.RSI(close_ltf, 25)  # RSI 25 CANDLES
+    rsi12_ltf = ta.RSI(close_ltf, 12)  # RSI 12 CANDLES
+    macd_line, macd_signal, macd_hist = ta.MACD(close_ltf, 12, 26, 9)  # MACD
+    atr7_ltf = ta.ATR(high_ltf, low_ltf, close_ltf, 7)  # ATR 7 CANDLES
 
     # form indicators LOW timeframe
     indicators_ltf = pd.DataFrame({
@@ -79,6 +80,7 @@ def find_indicators(highframe_df, lowframe_df):
     })
 
     return indicators_htf, indicators_ltf
+
 
 # testing
 if __name__ == "__main__":

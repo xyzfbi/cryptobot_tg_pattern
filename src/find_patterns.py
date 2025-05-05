@@ -15,12 +15,11 @@ from src.patterns_config import candlestick_patterns, candle_rankings
     3. D1 = 8
 """
 
-def find_patterns(data_df, lookback_period = 15):
 
+def find_patterns(data_df, lookback_period=15):
     if data_df.empty or len(data_df) < lookback_period:
         print("insufficient data")
         return pd.DataFrame()
-
 
     result = []
 
@@ -36,32 +35,35 @@ def find_patterns(data_df, lookback_period = 15):
         print(type(patterns_results))
         print(patterns_results.columns)'''
 
-        for i in data_df.head(lookback_period).index: # перебираем крч по исхожному индексу
+        for i in data_df.head(lookback_period).index:  # перебираем крч по исхожному индексу
             if patterns_results.iloc[i] != 0:
                 candle_num = i
                 datetime_candle = data_df.loc[i, 'datetime']
-                direction = "bullish" if patterns_results.iloc[i] > 0 else "bearish" # это функция возвращает
-                weight = candle_rankings.get(f"{pattern}_Bull" if direction == "bullish" else f"{pattern}_Bear",0 ) # это конфиг смотрит ранги
-                value = patterns_results.iloc[i] # это просто возвраащет значение талибовской функции
+                direction = "bullish" if patterns_results.iloc[i] > 0 else "bearish"  # это функция возвращает
+                weight = candle_rankings.get(f"{pattern}_Bull" if direction == "bullish" else f"{pattern}_Bear",
+                                             0)  # это конфиг смотрит ранги
+                value = patterns_results.iloc[i]  # это просто возвраащет значение талибовской функции
                 # print(candle_num, pattern, direction, weight, value)
 
                 result.append({
                     'candle_num': candle_num,
                     'datetime': datetime_candle,
                     'direction': direction,
-                    'pattern': pattern, # имя паттерна
-                    'value': value, # bullish / bearish возвращает функция талиб
-                    'weight': weight # вес по #https://thepatternsite.com/
+                    'pattern': pattern,  # имя паттерна
+                    'value': value,  # bullish / bearish возвращает функция талиб
+                    'weight': weight  # вес по #https://thepatternsite.com/
                 })
 
     # result_df = pd.DataFrame(result).sort_values(['weight'], ascending=[False])
     result_df = pd.DataFrame(result)
     return result_df
+
+
 # функция подтверэжения паттернов младшего таймфрейма с паттернами старшего optimized
 def confirm_patterns(data_htf, data_ltf):
     confirmed_patterns = []
-    patterns_ltf = find_patterns(data_ltf, lookback_period = 30)
-    patterns_htf = find_patterns(data_htf, lookback_period = 30)
+    patterns_ltf = find_patterns(data_ltf, lookback_period=30)
+    patterns_htf = find_patterns(data_htf, lookback_period=30)
 
     for _, row_ltf in patterns_ltf.iterrows():
         confirmed = False
@@ -69,7 +71,8 @@ def confirm_patterns(data_htf, data_ltf):
             # print(f"Comparing {row_ltf['pattern']} ({row_ltf['datetime']}) with {pattern['pattern']} ({pattern['datetime']})")
             if (row_ltf['pattern'] == pattern['pattern'] and
                     pattern['datetime'] <= row_ltf['datetime'] and
-                    abs(row_ltf['datetime'] - pattern['datetime']) <= pd.Timedelta(days=100) and # если был 3 дня назад максимум
+                    abs(row_ltf['datetime'] - pattern['datetime']) <= pd.Timedelta(
+                        days=100) and  # если был 3 дня назад максимум
                     pattern['value'] == row_ltf['value']):
                 # print(f"Confirmed: {row_ltf['pattern']} at {row_ltf['datetime']}")
                 confirmed = True
@@ -80,12 +83,10 @@ def confirm_patterns(data_htf, data_ltf):
     return result_df
 
 
-
-
 # сигналы на вход через rsi, macd, price относитльно ema и ichimoku cloud
 def generate_signal(trend_direction, last, confirmed_patterns):
     signal = 'hold'
-    bull_trend = ["strong_bullish", "bullish"] #pep8
+    bull_trend = ["strong_bullish", "bullish"]  # pep8
     bear_trend = ["strong_bearish", "bearish"]
     min_weight = 30
     if confirmed_patterns.empty:
@@ -101,14 +102,13 @@ def generate_signal(trend_direction, last, confirmed_patterns):
     weight_patterns_bull = sum(
         row['weight'] * weight_in_conditions
         for _, row in confirmed_patterns.iterrows()
-        if row['value'] == 100 and row['weight'] > min_weight # влияние паттернов вычисляется по весу
+        if row['value'] == 100 and row['weight'] > min_weight  # влияние паттернов вычисляется по весу
     )
     weight_patterns_bear = sum(
         row['weight'] * weight_in_conditions
         for _, row in confirmed_patterns.iterrows()
-        if row['value'] == -100 and row['weight'] > min_weight # влияние паттернов вычисляется по весу
+        if row['value'] == -100 and row['weight'] > min_weight  # влияние паттернов вычисляется по весу
     )
-
 
     # generate signal by using trading view system
     if trend_direction in bull_trend:
@@ -138,7 +138,6 @@ def generate_signal(trend_direction, last, confirmed_patterns):
             signal = "sell"
 
     return signal
-
 
 
 if __name__ == "__main__":

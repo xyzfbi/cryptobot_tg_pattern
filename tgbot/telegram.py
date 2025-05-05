@@ -1,6 +1,6 @@
 from aiogram import Bot, Router, Dispatcher
 from aiogram.filters import Command
-from aiogram.types import Message, BufferedInputFile, FSInputFile
+from aiogram.types import Message, FSInputFile
 from dotenv import load_dotenv
 import asyncio
 import os
@@ -24,6 +24,7 @@ user_data = {}
 STATE_IDLE = "idle"
 STATE_WAITING_COIN = "waiting_coin"
 
+
 @router.message(Command(commands="start"))
 async def send_welcome(message: Message):
     user_id = message.chat.id
@@ -32,25 +33,28 @@ async def send_welcome(message: Message):
     keyboard = kb.get_main_keyboard()
     user_name = message.from_user.username
     welcome_text = (f"Hi, @{user_name}!"
-                        f"\n\nI am a 🤖 for analyzing cryptocurrency movements using patterns and technical analysis!"
-                        f"\n\nAvailable commands: /start, /help"
-                        f"\nPlease choose one of the following commands by the keyboard below ⬇️"
-                        f"\n\nMade by HSE students. 🇷🇺")
+                    f"\n\nI am a 🤖 for analyzing cryptocurrency movements using patterns and technical analysis!"
+                    f"\n\nAvailable commands: /start, /help"
+                    f"\nPlease choose one of the following commands by the keyboard below ⬇️"
+                    f"\n\nMade by HSE students. 🇷🇺")
 
     await message.reply(welcome_text, reply_markup=keyboard)
+
 
 @router.message(lambda message: message.text.strip().lower() in ["Help 🚑", "/help"])
 async def send_help(message: Message):
     keyboard = kb.get_main_keyboard()
-    help_text =("Instruction for using our bot: \n\n"
-                "1. /start - run the bot and show main menu\n"
-                "2. /help - show this help message\n\n"
-                "3. Timeframe - by the click show timeframes to analyze: 15 minutes, 1 hour, 4 hours\n"
-                "After choice, bot will confirm it and show the check with in the box of the selected timeframe.\n\n"
-                "4. Choose coin - click to enter short name of pair of coin (BTCUSDT, SOLUSDT, DOGEUSDT)\n"
-                "If the coin exist - bot confirm it, otherwise, the bot will prompt you to enter again \n\n"
-                "5. Analyze - starting to analyze your coin, after the process - show you a plot with next movement of crypto\n")
+    help_text = ("Instruction for using our bot: \n\n"
+                 "1. /start - run the bot and show main menu\n"
+                 "2. /help - show this help message\n\n"
+                 "3. Timeframe - by the click show timeframes to analyze: 15 minutes, 1 hour, 4 hours\n"
+                 "After choice, bot will confirm it and show the check with in the box of the selected timeframe.\n\n"
+                 "4. Choose coin - click to enter short name of pair of coin (BTCUSDT, SOLUSDT, DOGEUSDT)\n"
+                 "If the coin exist - bot confirm it, otherwise, the bot will prompt you to enter again \n\n"
+                 "5. Analyze - starting to analyze your coin, after the process - show you a plot with next movement of crypto\n")
     await message.reply(help_text, reply_markup=keyboard)
+
+
 def analyzer(symbol, timeframe):
     timeframes = {
         '15 minutes': 15,
@@ -59,14 +63,15 @@ def analyzer(symbol, timeframe):
         '1 day': 'D'
     }
 
-    keys = list(timeframes.values()) # 15 60 'D'
-    cur_tf = timeframes[timeframe] # 15
+    keys = list(timeframes.values())  # 15 60 'D'
+    cur_tf = timeframes[timeframe]  # 15
 
-    idx = keys.index(cur_tf) # 0
+    idx = keys.index(cur_tf)  # 0
     next_tf = keys[idx + 1]
 
     analyze_obj = find_trend.TradingStrategy(symbol, cur_tf, next_tf)
     return analyze_obj, cur_tf, next_tf
+
 
 @router.message()
 async def handle_message(message: Message):
@@ -120,7 +125,7 @@ async def handle_message(message: Message):
         data_obj = rcv_bybit.CandlesData(symbol)
         for_jpg_data = data_obj.get_trend_data(timeframe=next_timeframe)
 
-        graph.depict_candle_graph(data=for_jpg_data, symbol=symbol,l_tf=current_timeframe, h_tf=next_timeframe)
+        graph.depict_candle_graph(data=for_jpg_data, symbol=symbol, l_tf=current_timeframe, h_tf=next_timeframe)
 
         path = "buf.jpg"
         result_text = result_obj.get_res_text()
@@ -131,6 +136,7 @@ async def handle_message(message: Message):
             reply_markup=kb.get_main_keyboard())
     else:
         await message.answer("Please use the menu buttons.", reply_markup=kb.get_main_keyboard())
+
 
 async def main():
     dp = Dispatcher()

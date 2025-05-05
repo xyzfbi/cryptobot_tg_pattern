@@ -14,7 +14,7 @@ def get_available_coins():
 
 
 class CandlesData:
-    def __init__(self, symbol="BTCUSDT"): # по дфеолту такой символ
+    def __init__(self, symbol="BTCUSDT"):  # по дфеолту такой символ
         self.session = HTTP()
         self.symbol = symbol
         self.timeframes = {
@@ -23,6 +23,7 @@ class CandlesData:
             '4 hours': 240,
             '1 day': 'D'
         }
+
     @staticmethod
     def normalize_df(df):
         df = df.apply(pd.to_numeric, errors="coerce")  # все в числа
@@ -30,6 +31,7 @@ class CandlesData:
                                         unit="ms")  # крч меняем юникс время в нормальное и свечи запрашиваются в обратном порядке те от ближайшего к нам до самого позднего
 
         return df
+
     def fetch_candles(self, interval, limit):
         response = session.get_kline(
             category="spot",
@@ -64,7 +66,7 @@ class CandlesData:
         return filename
 
 
-if __name__ == "__main__": #точка входа
+if __name__ == "__main__":  # точка входа
     symbol = input("Enter symbol: ")
     symbol = symbol.upper()
 
@@ -75,8 +77,7 @@ if __name__ == "__main__": #точка входа
     print(for_trend)
     print(for_pattern)
     print(for_trend.head(10))
-    data.candles_csv(for_pattern, df_name="for_pattern",timeframe="4h")
-
+    data.candles_csv(for_pattern, df_name="for_pattern", timeframe="4h")
 
 '''
 Содержание свечи
