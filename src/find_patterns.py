@@ -62,8 +62,8 @@ def find_patterns(data_df, lookback_period=15):
 # функция подтверэжения паттернов младшего таймфрейма с паттернами старшего optimized
 def confirm_patterns(data_htf, data_ltf):
     confirmed_patterns = []
-    patterns_ltf = find_patterns(data_ltf, lookback_period=30)
-    patterns_htf = find_patterns(data_htf, lookback_period=30)
+    patterns_ltf = find_patterns(data_ltf, lookback_period=13)
+    patterns_htf = find_patterns(data_htf, lookback_period=15)
 
     for _, row_ltf in patterns_ltf.iterrows():
         confirmed = False
@@ -72,7 +72,7 @@ def confirm_patterns(data_htf, data_ltf):
             if (row_ltf['pattern'] == pattern['pattern'] and
                     pattern['datetime'] <= row_ltf['datetime'] and
                     abs(row_ltf['datetime'] - pattern['datetime']) <= pd.Timedelta(
-                        days=100) and  # если был 3 дня назад максимум
+                        days=3) and  # если был 3 дня назад максимум
                     pattern['value'] == row_ltf['value']):
                 # print(f"Confirmed: {row_ltf['pattern']} at {row_ltf['datetime']}")
                 confirmed = True

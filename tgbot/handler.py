@@ -25,6 +25,7 @@ STATE_IDLE = "idle"
 STATE_WAITING_COIN = "waiting_coin"
 
 
+# welcome message
 @router.message(Command(commands="start"))
 async def send_welcome(message: Message):
     user_id = message.chat.id
@@ -40,7 +41,7 @@ async def send_welcome(message: Message):
 
     await message.reply(welcome_text, reply_markup=keyboard)
 
-
+# help place
 @router.message(lambda message: message.text.strip().lower() in ["Help 🚑", "/help"])
 async def send_help(message: Message):
     keyboard = kb.get_main_keyboard()
@@ -54,8 +55,9 @@ async def send_help(message: Message):
                  "5. Analyze - starting to analyze your coin, after the process - show you a plot with next movement of crypto\n")
     await message.reply(help_text, reply_markup=keyboard)
 
-
+# analyzer ->
 def analyzer(symbol, timeframe):
+    # dict with keys that user send to a bot and it gives to bybit api correct nums
     timeframes = {
         '15 minutes': 15,
         '1 hour': 60,
@@ -72,7 +74,7 @@ def analyzer(symbol, timeframe):
     analyze_obj = find_trend.TradingStrategy(symbol, cur_tf, next_tf)
     return analyze_obj, cur_tf, next_tf
 
-
+# handler of messagews
 @router.message()
 async def handle_message(message: Message):
     user_id = message.chat.id
@@ -83,17 +85,18 @@ async def handle_message(message: Message):
     if user_id not in user_states:
         user_states[user_id] = STATE_IDLE
 
+    # получаем монетку
     if user_states.get(user_id, STATE_IDLE) == STATE_WAITING_COIN:
         coin = text.upper()
         if coin in VALID_COINS:
             user_data[user_id]["symbol"] = coin if coin.endswith("USDT") else f"{coin}USDT"
-            premium_emoji_id = "ma5dxheeuemdidbrmm8"
             await message.answer(f"Coin selected💲", reply_markup=kb.get_main_keyboard(), parse_mode="HTML")
         else:
             await message.answer("Entered nonexistent coin ❌")
         user_states[user_id] = STATE_IDLE
         return
 
+    # если таймфрейм комманда с клавиатуры
     if text == "Timeframe ⏳":
 
         await message.answer("Choose timeframe:", reply_markup=kb.get_timeframe_keyboard())
@@ -102,11 +105,12 @@ async def handle_message(message: Message):
         user_data[user_id]["timeframe"] = text
         await message.answer(f"Selected timeframe - {text}", reply_markup=kb.get_main_keyboard())
 
+    # choose coin or state_idle
     elif text == "Choose coin 🪙":
 
         user_states[user_id] = STATE_WAITING_COIN
         await message.answer("Enter coin name", reply_markup=None)
-
+    #analyzer main logic
     elif text == "Analyze 👀":
         symbol = user_data[user_id].get("symbol")
         timeframe = user_data[user_id].get("timeframe")
@@ -137,7 +141,7 @@ async def handle_message(message: Message):
     else:
         await message.answer("Please use the menu buttons.", reply_markup=kb.get_main_keyboard())
 
-
+# main func
 async def main():
     dp = Dispatcher()
     dp.include_router(router)

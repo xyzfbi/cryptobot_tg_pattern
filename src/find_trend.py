@@ -121,20 +121,13 @@ class TradingStrategy:
         self.signal = generate_signal(self.trend_direction, self.last, self.confirmed_patterns)
         self.sl, self.tp = self.sl_tp(self.last)
 
-        self.print_res()
-
         return self.signal
 
-    def print_res(self):
-        print("price:", self.last['price'])
-        print("trend:", self.trend_direction)
-        print("strength:", self.trend_strength)
-        print("signal:", self.signal)
-        print("SL:", self.sl)
-        print("TP LEVELS:", self.tp)
+
 
     def get_res_text(self):
         result = (
+            f"Coin: {self.symbol}\n"
             f"price: {self.last['price']}\n"
             f"trend: {self.trend_direction}\n"
             f"strength: {self.trend_strength}\n"

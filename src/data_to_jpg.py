@@ -8,15 +8,21 @@ from src.find_trend import TradingStrategy
 
 
 def depict_candle_graph(data, symbol="BTCUSDT", l_tf=15, h_tf=60):
+    global sl_line_color, tp_line_color
     data = data.head(20)
 
     # преобразование в формат матплотлиба
     data['datetime'] = data['datetime'].map(mdates.date2num)
 
-    # выбор только нужных столбцов
-    data_ohlc = data[['datetime', 'open', 'high', 'low', 'close']]
-    data_ohlc = data_ohlc.astype(float)
-    print(data_ohlc)
+    # Выбор нужных столбцов и приведение к типу float
+    data_ohlc = data[['datetime', 'open', 'high', 'low', 'close']].astype(float)
+
+    # расчитываем ширину свечи основанной на таймфрейме
+    time_diffs = data_ohlc['datetime'].diff().dropna()
+    if not time_diffs.empty:
+        candle_width = time_diffs.min() * 0.8
+    else:
+        candle_width = 0.6  # запасной вариант, если дифф не вычисляется
 
     # шрифт
     prop = fm.FontProperties(family='DejaVu Sans', weight='bold')
@@ -26,11 +32,14 @@ def depict_candle_graph(data, symbol="BTCUSDT", l_tf=15, h_tf=60):
     ax.set_facecolor('#101014')
 
     # рисование свечей
-    candlestick_ohlc(ax, data_ohlc.values, width=0.6, colorup='#20b26c', colordown='#ef454a')
+    candlestick_ohlc(ax, data_ohlc.values, width=candle_width, colorup='#20b26c', colordown='#ef454a')
 
     # настройки осей
     ax.xaxis_date()
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M'))
+    if h_tf in [60, 240]:
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    else:
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M'))
     plt.xticks(rotation=0, color='#737376')
     plt.yticks(rotation=0, color='#737376')
     for tick in ax.get_xticklabels():
@@ -73,6 +82,8 @@ def depict_candle_graph(data, symbol="BTCUSDT", l_tf=15, h_tf=60):
     arrow_x = 2 * data_ohlc['datetime'].iloc[0] - data_ohlc['datetime'].iloc[1]
     arrow_y = max(data_ohlc['close'].iloc[0], data_ohlc['open'].iloc[0])
 
+
+    # отрисовка стрелки и sl _ tp
     if signal == 'buy' or signal == 'sell':
         color = 'green'
 
@@ -95,28 +106,29 @@ def depict_candle_graph(data, symbol="BTCUSDT", l_tf=15, h_tf=60):
         elif signal == 'sell':
             sl_line_color = 'red'
             tp_line_color = 'green'
-
-        ax.axhline(y=sl_level, color=sl_line_color, linestyle='--', linewidth=2)
-        ax.text(
-            data_ohlc['datetime'].iloc[0],
-            sl_level,
-            f"SL: {sl_level:.2f}",
-            color=sl_line_color,
-            fontweight='bold',
-            fontproperties=prop,
-            va='bottom' if signal == 'buy' else 'top'
-        )
-        for i, tp in enumerate(tp_levels):
-            ax.axhline(y=tp, color=tp_line_color, linestyle='--', linewidth=2)
+        if sl_level:
+            ax.axhline(y=sl_level, color=sl_line_color, linestyle='--', linewidth=2)
             ax.text(
                 data_ohlc['datetime'].iloc[0],
-                tp,
-                f"TP: {tp:.2f}",
-                color=tp_line_color,
+                sl_level,
+                f"SL: {sl_level:.2f}",
+                color=sl_line_color,
                 fontweight='bold',
                 fontproperties=prop,
                 va='bottom' if signal == 'buy' else 'top'
             )
+        for i, tp in enumerate(tp_levels):
+            if tp_levels:
+                ax.axhline(y=tp, color=tp_line_color, linestyle='--', linewidth=2)
+                ax.text(
+                    data_ohlc['datetime'].iloc[0],
+                    tp,
+                    f"TP: {tp:.2f}",
+                    color=tp_line_color,
+                    fontweight='bold',
+                    fontproperties=prop,
+                    va='bottom' if signal == 'buy' else 'top'
+                )
     else:
         color = 'grey'
         ax.annotate('',
@@ -155,4 +167,4 @@ class DepictCandleGraph:
 if __name__ == "__main__":
     symbol = input("Input symbol: ").upper()
     data_df = CandlesData(symbol).get_trend_data(timeframe='D')
-    depict_candle_graph(data_df, symbol, 240, 'D')
+    depict_candle_graph(data_df, symbol, 15, 60)
