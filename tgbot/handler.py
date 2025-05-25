@@ -131,7 +131,7 @@ async def handle_message(message: Message):
 
         graph.depict_candle_graph(data=for_jpg_data, symbol=symbol, l_tf=current_timeframe, h_tf=next_timeframe)
 
-        path = "buf.jpg"
+        path = "buf.png"
         result_text = result_obj.get_res_text()
 
         await message.answer_photo(
@@ -151,6 +151,3 @@ async def main():
     finally:
         await bot.session.close()
 
-
-if __name__ == "__main__":
-    asyncio.run(main())

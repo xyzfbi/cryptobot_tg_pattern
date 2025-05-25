@@ -7,9 +7,9 @@ from matplotlib import font_manager as fm
 from src.find_trend import TradingStrategy
 
 
+
 def depict_candle_graph(data, symbol="BTCUSDT", l_tf=15, h_tf=60):
-    global sl_line_color, tp_line_color
-    data = data.head(20)
+    data = data.head(20).copy()
 
     # преобразование в формат матплотлиба
     data['datetime'] = data['datetime'].map(mdates.date2num)
@@ -74,6 +74,7 @@ def depict_candle_graph(data, symbol="BTCUSDT", l_tf=15, h_tf=60):
     sl_level = strategy.sl
     tp_levels = strategy.tp
 
+
     # Получаем диапазон Y
     y_min, y_max = ax.get_ylim()
     y_range = (y_max - y_min) * 0.20
@@ -86,28 +87,31 @@ def depict_candle_graph(data, symbol="BTCUSDT", l_tf=15, h_tf=60):
     # отрисовка стрелки и sl _ tp
     if signal == 'buy' or signal == 'sell':
         color = 'green'
-
         if signal == 'sell':
             y_range = -y_range
             color = 'red'
 
-        ax.annotate('',
-                    xy=(arrow_x, arrow_y + y_range),
-                    xytext=(arrow_x, arrow_y),
-                    arrowprops=dict(facecolor=color, shrink=0, width=10, headwidth=28),
-                    fontsize=12,
-                    color=color)
+        # Задаем цвета ЛОКАЛЬНО, а не глобально!
+        sl_line_color = 'red'
+        tp_line_color = 'green'
 
-        ax.text(arrow_x, arrow_y - y_range * 0.25, f'{signal.upper()} Signal', fontsize=15, color='green', ha='left',
-                fontweight='bold', fontproperties=prop)
-        if signal == 'buy':
-            sl_line_color = 'red'
-            tp_line_color = 'green'
-        elif signal == 'sell':
-            sl_line_color = 'red'
-            tp_line_color = 'green'
+        ax.annotate(
+            '',
+            xy=(arrow_x, arrow_y + y_range),
+            xytext=(arrow_x, arrow_y),
+            arrowprops=dict(facecolor=color, shrink=0, width=10, headwidth=28),
+            fontsize=12,
+            color=color
+        )
+
+        ax.text(
+            arrow_x, arrow_y - y_range * 0.25, f'{signal.upper()} Signal',
+            fontsize=15, color=color, ha='left',
+            fontweight='bold', fontproperties=prop
+        )
+
         if sl_level:
-            ax.axhline(y=sl_level, color=sl_line_color, linestyle='--', linewidth=2)
+            ax.axhline(y=sl_level, color=sl_line_color, linestyle='-', linewidth=1, alpha=0.5)
             ax.text(
                 data_ohlc['datetime'].iloc[0],
                 sl_level,
@@ -115,41 +119,45 @@ def depict_candle_graph(data, symbol="BTCUSDT", l_tf=15, h_tf=60):
                 color=sl_line_color,
                 fontweight='bold',
                 fontproperties=prop,
-                va='bottom' if signal == 'buy' else 'top'
+                va='bottom' if signal == 'buy' else 'top',
+                ha='right',
             )
-        for i, tp in enumerate(tp_levels):
-            if tp_levels:
-                ax.axhline(y=tp, color=tp_line_color, linestyle='--', linewidth=2)
-                ax.text(
-                    data_ohlc['datetime'].iloc[0],
-                    tp,
-                    f"TP: {tp:.2f}",
-                    color=tp_line_color,
-                    fontweight='bold',
-                    fontproperties=prop,
-                    va='bottom' if signal == 'buy' else 'top'
-                )
+
+        for tp in tp_levels:
+            ax.axhline(y=tp, color=tp_line_color, linestyle='-', linewidth=1, alpha=0.5)
+            ax.text(
+                data_ohlc['datetime'].iloc[0],
+                tp,
+                f"TP: {tp:.2f}",
+                color=tp_line_color,
+                fontweight='bold',
+                fontproperties=prop,
+                va='bottom' if signal == 'buy' else 'top',
+                ha='right',
+            )
     else:
         color = 'grey'
-        ax.annotate('',
-                    xy=(arrow_x + y_range, arrow_y),
-                    xytext=(arrow_x, arrow_y),
-                    arrowprops=dict(facecolor=color, shrink=0, width=10, headwidth=28),
-                    fontsize=12,
-                    color=color)
-
-        ax.text(arrow_x,
-                arrow_y - y_range * 0.25,
-                f'{' '.join(signal.upper().split('_'))} Signal',
-                fontsize=15, color=color,
-                ha='left',
-                fontweight='bold',
-                fontproperties=prop
-                )
+        ax.annotate(
+            '',
+            xy=(arrow_x + y_range, arrow_y),
+            xytext=(arrow_x, arrow_y),
+            arrowprops=dict(facecolor=color, shrink=0, width=10, headwidth=28),
+            fontsize=12,
+            color=color
+        )
+        ax.text(
+            arrow_x,
+            arrow_y - y_range * 0.25,
+            f'{' '.join(signal.upper().split('_'))} Signal',
+            fontsize=15, color=color, ha='left',
+            fontweight='bold',
+            fontproperties=prop
+        )
 
     plt.tight_layout()
-    path = '../tgbot/buf.jpg'
+    path = '../tgbot/buf.png'
     plt.savefig(path)
+
 
 
 class DepictCandleGraph:
@@ -165,6 +173,6 @@ class DepictCandleGraph:
 
 
 if __name__ == "__main__":
-    symbol = input("Input symbol: ").upper()
-    data_df = CandlesData(symbol).get_trend_data(timeframe='D')
-    depict_candle_graph(data_df, symbol, 15, 60)
+    smbl = input("Input symbol: ").upper()
+    data_df = CandlesData(smbl).get_trend_data(timeframe='D')
+    depict_candle_graph(data_df, smbl, 15, 60)

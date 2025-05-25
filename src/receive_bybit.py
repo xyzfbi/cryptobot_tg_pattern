@@ -67,10 +67,10 @@ class CandlesData:
 
 
 if __name__ == "__main__":  # точка входа
-    symbol = input("Enter symbol: ")
-    symbol = symbol.upper()
+    smbl = input("Enter symbol: ")
+    smbl = smbl.upper()
 
-    data = CandlesData(symbol)
+    data = CandlesData(smbl)
     for_pattern = data.get_pattern_indicators_data()
 
     for_trend = data.get_trend_data()
