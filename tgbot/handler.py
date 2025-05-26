@@ -1,3 +1,4 @@
+from typing import Tuple, Union
 from aiogram import Bot, Router, Dispatcher
 from aiogram.filters import Command
 from aiogram.types import Message, FSInputFile
@@ -27,7 +28,7 @@ STATE_WAITING_COIN = "waiting_coin"
 
 # welcome message
 @router.message(Command(commands="start"))
-async def send_welcome(message: Message):
+async def send_welcome(message: Message) -> None:
     user_id = message.chat.id
     user_states[user_id] = STATE_IDLE
 
@@ -43,7 +44,7 @@ async def send_welcome(message: Message):
 
 # help place
 @router.message(lambda message: message.text.strip().lower() in ["Help 🚑", "/help"])
-async def send_help(message: Message):
+async def send_help(message: Message) -> None:
     keyboard = kb.get_main_keyboard()
     help_text = ("Instruction for using our bot: \n\n"
                  "1. /start - run the bot and show main menu\n"
@@ -56,8 +57,8 @@ async def send_help(message: Message):
     await message.reply(help_text, reply_markup=keyboard)
 
 # analyzer ->
-def analyzer(symbol, timeframe):
-    # dict with keys that user send to a bot and it gives to bybit api correct nums
+def analyzer(symbol : str, timeframe : str) -> Tuple[find_trend.TradingStrategy, Union[str, int], Union[str, int]]:
+    # dict with keys that user send to a bot, and it gives to bybit api correct nums
     timeframes = {
         '15 minutes': 15,
         '1 hour': 60,
@@ -76,7 +77,7 @@ def analyzer(symbol, timeframe):
 
 # handler of messagews
 @router.message()
-async def handle_message(message: Message):
+async def handle_message(message: Message) -> None:
     user_id = message.chat.id
     text = message.text.strip()
 
@@ -142,7 +143,7 @@ async def handle_message(message: Message):
         await message.answer("Please use the menu buttons.", reply_markup=kb.get_main_keyboard())
 
 # main func
-async def main():
+async def main() -> None:
     dp = Dispatcher()
     dp.include_router(router)
 

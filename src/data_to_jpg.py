@@ -1,3 +1,7 @@
+from typing import Optional, Union
+
+import pandas as pd
+
 from src.receive_bybit import CandlesData
 import matplotlib.pyplot as plt
 from mplfinance.original_flavor import candlestick_ohlc
@@ -8,7 +12,7 @@ from src.find_trend import TradingStrategy
 
 
 
-def depict_candle_graph(data, symbol="BTCUSDT", l_tf=15, h_tf=60):
+def depict_candle_graph(data : pd.DataFrame, symbol : str="BTCUSDT", l_tf : Union[str, int]=15, h_tf: Union[str, int]=60) -> None:
     data = data.head(20).copy()
 
     # преобразование в формат матплотлиба

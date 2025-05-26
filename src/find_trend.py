@@ -2,29 +2,31 @@ from src.find_patterns import confirm_patterns
 from src.calculate_indicators import find_indicators
 from src.receive_bybit import CandlesData
 from decimal import Decimal
+from typing import Any, Tuple, List, Dict, Optional, Union
+import pandas as pd
 
 class TradingStrategy:
-    def __init__(self, symbol, l_timeframe, h_timeframe):
-        self.symbol = symbol.upper()
-        self.l_timeframe = l_timeframe
-        self.h_timeframe = h_timeframe
+    def __init__(self, symbol : str, l_timeframe : int, h_timeframe : Union[int, str]):
+        self.symbol: str = symbol.upper()
+        self.l_timeframe: int = l_timeframe
+        self.h_timeframe: int = h_timeframe
 
-        self.trend_data = CandlesData(self.symbol).get_trend_data(timeframe=h_timeframe)
-        self.pattern_data = CandlesData(self.symbol).get_pattern_indicators_data(timeframe=l_timeframe)
+        self.trend_data: pd.DataFrame = CandlesData(self.symbol).get_trend_data(timeframe=h_timeframe)
+        self.pattern_data: pd.DataFrame = CandlesData(self.symbol).get_pattern_indicators_data(timeframe=l_timeframe)
         self.trend_indicators, self.pattern_indicators = find_indicators(self.trend_data, self.pattern_data)
 
-        self.trend_direction = None
-        self.trend_strength = None
-        self.last = None
-        self.confirmed_patterns = None
-        self.signal = None
-        self.sl = None
-        self.tp = None
+        self.trend_direction: Optional[str] = None
+        self.trend_strength: Optional[str] = None
+        self.last: Optional[Dict[str, Any]] = None
+        self.confirmed_patterns: Optional[pd.DataFrame] = None
+        self.signal: Optional[str] = None
+        self.sl: Optional[float] = None
+        self.tp: Optional[List[float]] = None
 
         self._fill_last()
         self._analyze()
 
-    def _fill_last(self):
+    def _fill_last(self) -> None:
         self.last = {
             'price': self.trend_data['close'].iloc[0],  # price now
             'sma150': self.trend_indicators['sma150'].iloc[-1],  # простая скользящая средняя на 150 свеч
@@ -51,13 +53,13 @@ class TradingStrategy:
             # https://ru.wikipedia.org/wiki/%D0%98%D0%BD%D0%B8%D0%BA%D0%B0%D1%82%D0%BE%D1%80_MACD
         }
 
-    def _analyze(self):
+    def _analyze(self) -> None:
         self.trend_direction, self.trend_strength, self.last = self.find_trend()
         self.confirmed_patterns = confirm_patterns(self.trend_data, self.pattern_data)
         self.signal = self.generate_signal(self.trend_direction, self.last, self.confirmed_patterns)
         self.sl, self.tp = self.sl_tp(self.signal)
 
-    def find_trend(self):
+    def find_trend(self) -> Tuple[str, str, Dict[str, any]]:
 
         # ЗАПРАЩИВАЕМ ПОСЛЕДНИЕ ЗНАЧЕНИЯ ИНДИКАТОРОВ ДЛЯ КАЖДОГО ФРЕЙМА
 
@@ -91,7 +93,7 @@ class TradingStrategy:
         return trend_direction, trend_strength, self.last
 
     # sl tp через atr ema и ichimoku
-    def sl_tp(self, signal):
+    def sl_tp(self, signal : str) -> Tuple[Optional[float], List[float]]:
         sl = None
         tp = []
 
@@ -132,7 +134,7 @@ class TradingStrategy:
     # sl tp надо немного под паттерны переделать
 
     @staticmethod
-    def generate_signal(trend_direction, last, confirmed_patterns):
+    def generate_signal(trend_direction : str, last : Dict[str, any], confirmed_patterns : pd.DataFrame) -> str:
         bull_trend = ["strong_bullish", "bullish"]  # pep8
         bear_trend = ["strong_bearish", "bearish"]
         min_weight = 25
@@ -188,13 +190,13 @@ class TradingStrategy:
 
         return "hold"
 
-    def return_signal(self):
+    def return_signal(self) -> Optional[str]:
         # Пересчёт, если нужно вручную обновить состояние
         self._fill_last()
         self._analyze()
         return self.signal
 
-    def get_res_text(self):
+    def get_res_text(self) -> str:
         result = (
             f"Coin: {self.symbol}\n"
             f"price: {self.last['price']}\n"
