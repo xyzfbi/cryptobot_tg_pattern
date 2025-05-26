@@ -24,3 +24,29 @@ conda remove старый_пакет
 ```
 conda env export --no-builds > environment.yml
 ```
+# cryptobot_tg_pattern
+
+## Структура проекта
+
+```
+cryptobot_tg_pattern/
+├── environment.yml
+├── fonts/
+│   └── Arimo-VariableFont_wght.ttf
+├── README.md
+├── src/
+│   ├── calculate_indicators.py
+│   ├── data_to_jpg.py
+│   ├── find_patterns.py
+│   ├── find_trend.py
+│   ├── patterns_config.py
+│   └── receive_bybit.py
+└── tgbot/
+    ├── buf.png
+    ├── handler.py
+    ├── keyboard.py
+    ├── main.py
+    └── rm_commands.py
+```
+
+---
