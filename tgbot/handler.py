@@ -51,7 +51,7 @@ async def send_help(message: Message) -> None:
                  "2. /help - show this help message\n\n"
                  "3. Timeframe - by the click show timeframes to analyze: 15 minutes, 1 hour, 4 hours\n"
                  "After choice, bot will confirm it and show the check with in the box of the selected timeframe.\n\n"
-                 "4. Choose coin - click to enter short name of pair of coin (BTCUSDT, SOLUSDT, DOGEUSDT)\n"
+                 "4. Choose coin - click to enter short name coin (BTC/btc, SOL/sol)\n"
                  "If the coin exist - bot confirm it, otherwise, the bot will prompt you to enter again \n\n"
                  "5. Analyze - starting to analyze your coin, after the process - show you a plot with next movement of crypto\n")
     await message.reply(help_text, reply_markup=keyboard)
