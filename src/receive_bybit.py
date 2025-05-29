@@ -16,7 +16,7 @@ def get_available_coins() -> List[str]:
 
 
 class CandlesData:
-    def __init__(self, symbol: str  ="BTCUSDT"):  # по дфеолту такой символ
+    def __init__(self, symbol: str = "BTCUSDT"):  # по дфеолту такой символ
         self.session = HTTP()
         self.symbol = symbol
         self.timeframes = {
@@ -27,14 +27,14 @@ class CandlesData:
         }
 
     @staticmethod
-    def normalize_df(df : pd.DataFrame) -> pd.DataFrame:
+    def normalize_df(df: pd.DataFrame) -> pd.DataFrame:
         df = df.apply(pd.to_numeric, errors="coerce")  # все в числа
         df["datetime"] = pd.to_datetime(df["datetime"],
                                         unit="ms")  # крч меняем юникс время в нормальное и свечи запрашиваются в обратном порядке те от ближайшего к нам до самого позднего
 
         return df
 
-    def fetch_candles(self, interval : int, limit : int) -> pd.DataFrame:
+    def fetch_candles(self, interval: int, limit: int) -> pd.DataFrame:
         response = session.get_kline(
             category="spot",
             symbol=self.symbol,
@@ -59,10 +59,10 @@ class CandlesData:
     def get_pattern_indicators_data(self, candles_count: int = 50, timeframe: Union[int, str] = 15) -> pd.DataFrame:
         return self.fetch_candles(timeframe, candles_count)
 
-    def get_trend_data(self, candles_count: int=150, timeframe: Union[int, str] = 60) -> pd.DataFrame:
+    def get_trend_data(self, candles_count: int = 150, timeframe: Union[int, str] = 60) -> pd.DataFrame:
         return self.fetch_candles(timeframe, candles_count)
 
-    def candles_csv(self, df: pd.DataFrame, timeframe : Union[str, int], df_name : str) -> str:
+    def candles_csv(self, df: pd.DataFrame, timeframe: Union[str, int], df_name: str) -> str:
         filename = f"data/{self.symbol}_{df_name}_{timeframe}.csv"
         df.to_csv(filename, index=False)
         return filename

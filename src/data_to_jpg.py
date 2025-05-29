@@ -1,7 +1,7 @@
 from typing import Optional, Union
 
 import pandas as pd
-
+import os
 from src.receive_bybit import CandlesData
 import matplotlib.pyplot as plt
 from mplfinance.original_flavor import candlestick_ohlc
@@ -11,8 +11,8 @@ from matplotlib import font_manager as fm
 from src.find_trend import TradingStrategy
 
 
-
-def depict_candle_graph(data : pd.DataFrame, symbol : str="BTCUSDT", l_tf : Union[str, int]=15, h_tf: Union[str, int]=60) -> None:
+def depict_candle_graph(data: pd.DataFrame, symbol: str = "BTCUSDT", l_tf: Union[str, int] = 15,
+                        h_tf: Union[str, int] = 60) -> None:
     data = data.head(20).copy()
 
     # преобразование в формат матплотлиба
@@ -78,7 +78,6 @@ def depict_candle_graph(data : pd.DataFrame, symbol : str="BTCUSDT", l_tf : Unio
     sl_level = strategy.sl
     tp_levels = strategy.tp
 
-
     # Получаем диапазон Y
     y_min, y_max = ax.get_ylim()
     y_range = (y_max - y_min) * 0.20
@@ -86,7 +85,6 @@ def depict_candle_graph(data : pd.DataFrame, symbol : str="BTCUSDT", l_tf : Unio
     # начальные координаты стрелки
     arrow_x = 2 * data_ohlc['datetime'].iloc[0] - data_ohlc['datetime'].iloc[1]
     arrow_y = max(data_ohlc['close'].iloc[0], data_ohlc['open'].iloc[0])
-
 
     # отрисовка стрелки и sl _ tp
     if signal == 'buy' or signal == 'sell':
@@ -159,9 +157,9 @@ def depict_candle_graph(data : pd.DataFrame, symbol : str="BTCUSDT", l_tf : Unio
         )
 
     plt.tight_layout()
-    path = '../tgbot/buf.png'
+    path = os.path.join('tgbot', 'buf.png')
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     plt.savefig(path)
-
 
 
 class DepictCandleGraph:

@@ -16,7 +16,7 @@ from src.patterns_config import candlestick_patterns, candle_rankings
 """
 
 
-def find_patterns(data_df : pd.DataFrame, lookback_period: int = 15) -> pd.DataFrame:
+def find_patterns(data_df: pd.DataFrame, lookback_period: int = 15) -> pd.DataFrame:
     if data_df.empty or len(data_df) < lookback_period:
         print("insufficient data")
         return pd.DataFrame()
@@ -60,7 +60,7 @@ def find_patterns(data_df : pd.DataFrame, lookback_period: int = 15) -> pd.DataF
 
 
 # функция подтверэжения паттернов младшего таймфрейма с паттернами старшего optimized
-def confirm_patterns(data_htf : pd.DataFrame, data_ltf : pd.DataFrame) -> pd.DataFrame:
+def confirm_patterns(data_htf: pd.DataFrame, data_ltf: pd.DataFrame) -> pd.DataFrame:
     confirmed_patterns = []
     patterns_ltf = find_patterns(data_ltf, lookback_period=20)
     patterns_htf = find_patterns(data_htf, lookback_period=20)
@@ -81,7 +81,6 @@ def confirm_patterns(data_htf : pd.DataFrame, data_ltf : pd.DataFrame) -> pd.Dat
             confirmed_patterns.append(row_ltf)
     result_df = pd.DataFrame(confirmed_patterns)
     return result_df
-
 
 
 if __name__ == "__main__":

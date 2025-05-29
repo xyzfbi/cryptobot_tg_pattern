@@ -5,8 +5,9 @@ from decimal import Decimal
 from typing import Any, Tuple, List, Dict, Optional, Union
 import pandas as pd
 
+
 class TradingStrategy:
-    def __init__(self, symbol : str, l_timeframe : int, h_timeframe : Union[int, str]):
+    def __init__(self, symbol: str, l_timeframe: int, h_timeframe: Union[int, str]):
         self.symbol: str = symbol.upper()
         self.l_timeframe: int = l_timeframe
         self.h_timeframe: int = h_timeframe
@@ -93,7 +94,7 @@ class TradingStrategy:
         return trend_direction, trend_strength, self.last
 
     # sl tp через atr ema и ichimoku
-    def sl_tp(self, signal : str) -> Tuple[Optional[float], List[float]]:
+    def sl_tp(self, signal: str) -> Tuple[Optional[float], List[float]]:
         sl = None
         tp = []
 
@@ -134,7 +135,7 @@ class TradingStrategy:
     # sl tp надо немного под паттерны переделать
 
     @staticmethod
-    def generate_signal(trend_direction : str, last : Dict[str, any], confirmed_patterns : pd.DataFrame) -> str:
+    def generate_signal(trend_direction: str, last: Dict[str, any], confirmed_patterns: pd.DataFrame) -> str:
         bull_trend = ["strong_bullish", "bullish"]  # pep8
         bear_trend = ["strong_bearish", "bearish"]
         min_weight = 25

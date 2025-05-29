@@ -6,7 +6,7 @@ import talib as ta
 
 
 # calculate ichimoku   !!!!
-def calculate_ichimoku(df : pd.DataFrame, tenkan_num: int = 9, kijun_period: int = 26, senkou_period: int =52):
+def calculate_ichimoku(df: pd.DataFrame, tenkan_num: int = 9, kijun_period: int = 26, senkou_period: int = 52):
     result_df = pd.DataFrame()
 
     tenkan_high = df['high'].rolling(tenkan_num).max()
@@ -35,7 +35,7 @@ def calculate_ichimoku(df : pd.DataFrame, tenkan_num: int = 9, kijun_period: int
 
 
 # вычисление всех нужных индикаторов
-def find_indicators(highframe_df : pd.DataFrame, lowframe_df :pd.DataFrame) -> Tuple[DataFrame, DataFrame]:
+def find_indicators(highframe_df: pd.DataFrame, lowframe_df: pd.DataFrame) -> Tuple[DataFrame, DataFrame]:
     # module high time frame
     high_htf = highframe_df['high']
     close_htf = highframe_df["close"]

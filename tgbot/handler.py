@@ -42,8 +42,9 @@ async def send_welcome(message: Message) -> None:
 
     await message.reply(welcome_text, reply_markup=keyboard)
 
+
 # help place
-@router.message(lambda message: message.text.strip().lower() in ["Help 🚑", "/help"])
+@router.message(lambda message: message.text.strip().lower() in ("Help 🚑", "/help"))
 async def send_help(message: Message) -> None:
     keyboard = kb.get_main_keyboard()
     help_text = ("Instruction for using our bot: \n\n"
@@ -56,8 +57,9 @@ async def send_help(message: Message) -> None:
                  "5. Analyze - starting to analyze your coin, after the process - show you a plot with next movement of crypto\n")
     await message.reply(help_text, reply_markup=keyboard)
 
+
 # analyzer ->
-def analyzer(symbol : str, timeframe : str) -> Tuple[find_trend.TradingStrategy, Union[str, int], Union[str, int]]:
+def analyzer(symbol: str, timeframe: str) -> Tuple[find_trend.TradingStrategy, Union[str, int], Union[str, int]]:
     # dict with keys that user send to a bot, and it gives to bybit api correct nums
     timeframes = {
         '15 minutes': 15,
@@ -74,6 +76,7 @@ def analyzer(symbol : str, timeframe : str) -> Tuple[find_trend.TradingStrategy,
 
     analyze_obj = find_trend.TradingStrategy(symbol, cur_tf, next_tf)
     return analyze_obj, cur_tf, next_tf
+
 
 # handler of messagews
 @router.message()
@@ -111,7 +114,7 @@ async def handle_message(message: Message) -> None:
 
         user_states[user_id] = STATE_WAITING_COIN
         await message.answer("Enter coin name", reply_markup=None)
-    #analyzer main logic
+    # analyzer main logic
     elif text == "Analyze 👀":
         symbol = user_data[user_id].get("symbol")
         timeframe = user_data[user_id].get("timeframe")
@@ -132,7 +135,7 @@ async def handle_message(message: Message) -> None:
 
         graph.depict_candle_graph(data=for_jpg_data, symbol=symbol, l_tf=current_timeframe, h_tf=next_timeframe)
 
-        path = "buf.png"
+        path = os.path.join("tgbot", "buf.png")
         result_text = result_obj.get_res_text()
 
         await message.answer_photo(
@@ -141,6 +144,7 @@ async def handle_message(message: Message) -> None:
             reply_markup=kb.get_main_keyboard())
     else:
         await message.answer("Please use the menu buttons.", reply_markup=kb.get_main_keyboard())
+
 
 # main func
 async def main() -> None:
@@ -151,4 +155,3 @@ async def main() -> None:
         await dp.start_polling(bot, timeout_sec=120)
     finally:
         await bot.session.close()
-
