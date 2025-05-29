@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import asyncio
 import os
 import logging
-import keyboard as kb
+import tgbot.keyboard as kb
 import src.receive_bybit as rcv_bybit
 import src.find_trend as find_trend
 import src.data_to_jpg as graph
