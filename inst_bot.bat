@@ -2,12 +2,9 @@
 cd /d "%~dp0"
 set PYTHONPATH=%CD%
 
-:: Укажи URL твоего репо на GitHub
 set REPO_URL=https://github.com/xyzfbi/cryptobot_tg_pattern
-:: Имя папки для клонирования (можно изменить)
 set REPO_DIR=cryptobot_tg
 
-:: Проверяем, определена ли переменная CONDA
 if not defined CONDA (
     set "CONDA=%USERPROFILE%\Miniconda3"
     if not exist "%CONDA%\Scripts\activate.bat" (
@@ -21,7 +18,6 @@ if not exist "%CONDA%\Scripts\activate.bat" (
     exit /b 1
 )
 
-:: Проверяем наличие Git
 where git >nul 2>&1
 if errorlevel 1 (
     echo ERROR: Git is not installed or not in PATH. Please install Git from https://git-scm.com/download/win
@@ -29,7 +25,6 @@ if errorlevel 1 (
     exit /b 1
 )
 
-:: Проверяем, существует ли папка репо, и клонируем, если нет
 if not exist "%REPO_DIR%" (
     echo Cloning repository from %REPO_URL%
     git clone %REPO_URL% %REPO_DIR%
@@ -41,6 +36,8 @@ if not exist "%REPO_DIR%" (
 ) else (
     echo Repository already exists in %REPO_DIR%
 )
+cd /d "%REPO_DIR%"
+
 
 call "%CONDA%\Scripts\activate.bat"
 
