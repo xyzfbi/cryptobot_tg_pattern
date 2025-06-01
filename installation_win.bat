@@ -78,13 +78,6 @@ if errorlevel 1 (
     exit /b 1
 )
 
-:: Запускаем run_bot.bat
-call run_bot.bat
-if errorlevel 1 (
-    echo ERROR: Failed to run run_bot.bat.
-    pause
-    exit /b 1
-)
 
 :: Пауза для отладки (убери, если не нужна)
 pause
