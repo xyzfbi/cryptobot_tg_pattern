@@ -15,7 +15,6 @@ if not defined CONDA (
     )
 )
 
-:: Проверяем наличие activate.bat
 if not exist "%CONDA%\Scripts\activate.bat" (
     echo ERROR: Conda not found at %CONDA%. Please set the correct CONDA path.
     pause
@@ -43,20 +42,8 @@ if not exist "%REPO_DIR%" (
     echo Repository already exists in %REPO_DIR%
 )
 
-:: Переходим в папку репо
-cd /d "%REPO_DIR%"
-
-:: Проверяем наличие run_bot.bat
-if not exist "run_bot.bat" (
-    echo ERROR: run_bot.bat not found in %REPO_DIR%.
-    pause
-    exit /b 1
-)
-
-:: Активируем Conda
 call "%CONDA%\Scripts\activate.bat"
 
-:: Проверяем наличие окружения cryptobot_tg
 conda env list | findstr /C:"cryptobot_tg" >nul
 if errorlevel 1 (
     echo Creating Conda environment 'cryptobot_tg' from environment.yml
@@ -70,14 +57,16 @@ if errorlevel 1 (
     echo Environment 'cryptobot_tg' already exists
 )
 
-:: Активируем окружение
 call conda activate cryptobot_tg
 if errorlevel 1 (
     echo ERROR: Failed to activate Conda environment 'cryptobot_tg'.
     pause
     exit /b 1
 )
-
-
-:: Пауза для отладки (убери, если не нужна)
+python main.py
+if errorlevel 1 (
+    echo ERROR: Failed to run main.py.
+    pause
+    exit /b 1
+)
 pause
