@@ -97,7 +97,7 @@ class TradingStrategy:
     def sl_tp(self, signal: str) -> Tuple[Optional[float], List[float]]:
         sl = None
         tp = []
-
+        sl_multiplier = 0.92
         atr_multiplier = 2.0
         tp_multipliers = [1.0, 2.0, 3.0]
 
@@ -110,8 +110,8 @@ class TradingStrategy:
                 self.last['ema50'] - atr_multiplier * self.last['atr7'],
                 self.last['senkou_b'] if self.last['senkou_b'] < self.last['price'] else None
             ]
-            sl = max([x for x in sl_candidates if x is not None])
-
+            sl = min([x for x in sl_candidates if x is not None])
+            sl *= sl_multiplier
             tp = [self.last['price'] + m * self.last['atr7'] for m in tp_multipliers]
             if self.last['senkou_a'] > self.last['price']:
                 tp.append(self.last['senkou_a'])
@@ -124,7 +124,8 @@ class TradingStrategy:
                 self.last['ema50'] + atr_multiplier * self.last['atr7'],
                 self.last['senkou_b'] if self.last['senkou_b'] > self.last['price'] else None
             ]
-            sl = min([x for x in sl_candidates if x is not None])
+            sl = max([x for x in sl_candidates if x is not None])
+            sl *= sl_multiplier
 
             tp = [self.last['price'] - m * self.last['atr7'] for m in tp_multipliers]
             if self.last['senkou_a'] < self.last['price']:

@@ -6,7 +6,7 @@ def get_main_keyboard() -> ReplyKeyboardMarkup:
         [KeyboardButton(text="Timeframe ⏳"), ],
         [KeyboardButton(text="Choose coin 🪙")],
         [KeyboardButton(text="Analyze 👀")],
-        [KeyboardButton(text="Help 🚑")],
+        [KeyboardButton(text="/help")],
     ], resize_keyboard=True, one_time_keyboard=False)
 
     return keyboard

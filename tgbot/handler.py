@@ -36,7 +36,7 @@ async def send_welcome(message: Message) -> None:
     user_name = message.from_user.username
     welcome_text = (f"Hi, @{user_name}!"
                     f"\n\nI am a 🤖 for analyzing cryptocurrency movements using patterns and technical analysis!"
-                    f"\n\nAvailable commands: /start, /help"
+                    f"\n\nAvailable commands: /start, /help, /feedback"
                     f"\nPlease choose one of the following commands by the keyboard below ⬇️"
                     f"\n\nMade by HSE students. 🇷🇺")
 
@@ -49,14 +49,20 @@ async def send_help(message: Message) -> None:
     keyboard = kb.get_main_keyboard()
     help_text = ("Instruction for using our bot: \n\n"
                  "1. /start - run the bot and show main menu\n"
-                 "2. /help - show this help message\n\n"
-                 "3. Timeframe - by the click show timeframes to analyze: 15 minutes, 1 hour, 4 hours\n"
+                 "2. /help - show this help message\n"
+                 "3. /feedback - show feedback message\n\n"
+                 "4. Timeframe - by the click show timeframes to analyze: 15 minutes, 1 hour, 4 hours\n"
                  "After choice, bot will confirm it and show the check with in the box of the selected timeframe.\n\n"
-                 "4. Choose coin - click to enter short name coin (BTC/btc, SOL/sol)\n"
+                 "5. Choose coin - click to enter short name coin (BTC/btc, SOL/sol)\n"
                  "If the coin exist - bot confirm it, otherwise, the bot will prompt you to enter again \n\n"
-                 "5. Analyze - starting to analyze your coin, after the process - show you a plot with next movement of crypto\n")
+                 "6. Analyze - starting to analyze your coin, after the process - show you a plot with next movement of crypto\n")
     await message.reply(help_text, reply_markup=keyboard)
-
+@router.message(Command("feedback"))
+async def send_feedback(message: Message) -> None:
+    feddback_text = ("If you are stuck with bot or have any reviews and views how to improve it, you can send any message to developers: \n"
+                     "@btwpepe, @itwastoohard\n\n"
+                     "We are appreciate your experience and free for every questions!")
+    await message.reply(feddback_text)
 
 # analyzer ->
 def analyzer(symbol: str, timeframe: str) -> Tuple[find_trend.TradingStrategy, Union[str, int], Union[str, int]]:
