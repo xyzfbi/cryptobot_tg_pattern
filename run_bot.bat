@@ -12,7 +12,7 @@ if errorlevel 1 (
     echo Environment 'cryptobot_tg' already exists
 )
 
-call conda activate cryptobotto_tg
+call conda activate cryptobot_tg
 
 python main.py
 pause
