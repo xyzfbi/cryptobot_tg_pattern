@@ -30,23 +30,25 @@ conda env export --no-builds > environment.yml
 
 ```
 cryptobot_tg_pattern/
-├── environment.yml
-├── fonts/
+├── environment.yml        # Conda environment spec
+├── .env                   # API ключи
+├── .gitignore             # Игнорируемые файлы
+├── fonts/                 # Шрифты для графиков
 │   └── Arimo-VariableFont_wght.ttf
-├── README.md
-├── src/
-│   ├── calculate_indicators.py
-│   ├── data_to_jpg.py
-│   ├── find_patterns.py
-│   ├── find_trend.py
-│   ├── patterns_config.py
-│   └── receive_bybit.py
-└── tgbot/
-    ├── buf.png
-    ├── handler.py
-    ├── keyboard.py
-    ├── main.py
-    └── rm_commands.py
+├── scripts to run/                 # промежуточные скрипты для установки
+│   ├── linux.sh           # Промежуточный скрипт запуск Linux
+│   └── windows.bat   # Промежуточный скрипт запуск Windows
+├── src/                   # Ядро анализа
+│   ├── receive_bybit.py     # Получение данных с ByBit
+│   ├── calculate_indicators.py # Расчет технических индикаторов
+│   ├── find_patterns.py      # Распознавание паттернов
+│   ├── find_trend.py         # Анализ тренда и генерация сигнала
+│   ├── patterns_config.py    # Параметры паттернов
+│   └── data_to_jpg.py        # Визуализация паттернов
+├── tgbot/                 # Telegram-бот
+│   ├── handler.py           # Обработчик сообщений
+│   └── keyboard.py          # Интерактивные клавиатуры
+├── main.py                # Точка входа
 ```
 
 ---
