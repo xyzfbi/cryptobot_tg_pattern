@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Union
 
 import pandas as pd
 from pybit.unified_trading import HTTP
@@ -19,28 +19,19 @@ class CandlesData:
     def __init__(self, symbol: str = "BTCUSDT"):  # по дфеолту такой символ
         self.session = HTTP()
         self.symbol = symbol
-        self.timeframes = {
-            '15 minutes': 15,
-            '1 hour': 60,
-            '4 hours': 240,
-            '1 day': 'D'
-        }
+        self.timeframes = {"15 minutes": 15, "1 hour": 60, "4 hours": 240, "1 day": "D"}
 
     @staticmethod
     def normalize_df(df: pd.DataFrame) -> pd.DataFrame:
         df = df.apply(pd.to_numeric, errors="coerce")  # все в числа
-        df["datetime"] = pd.to_datetime(df["datetime"],
-                                        unit="ms")  # крч меняем юникс время в нормальное и свечи запрашиваются в обратном порядке те от ближайшего к нам до самого позднего
+        df["datetime"] = pd.to_datetime(
+            df["datetime"], unit="ms"
+        )  # крч меняем юникс время в нормальное и свечи запрашиваются в обратном порядке те от ближайшего к нам до самого позднего
 
         return df
 
     def fetch_candles(self, interval: int, limit: int) -> pd.DataFrame:
-        response = session.get_kline(
-            category="spot",
-            symbol=self.symbol,
-            interval=str(interval),
-            limit=limit
-        )
+        response = session.get_kline(category="spot", symbol=self.symbol, interval=str(interval), limit=limit)
 
         df = pd.DataFrame(
             response["result"]["list"],
@@ -52,7 +43,7 @@ class CandlesData:
                 "close",
                 "volume",  # это в биткоинах тут
                 "quote_volume",  # это в usdt
-            ]
+            ],
         )
         return self.normalize_df(df)
 
@@ -81,7 +72,7 @@ if __name__ == "__main__":  # точка входа
     print(for_trend.head(10))
     data.candles_csv(for_pattern, df_name="for_pattern", timeframe="4h")
 
-'''
+"""
 Содержание свечи
 
 [
@@ -93,4 +84,4 @@ if __name__ == "__main__":  # точка входа
     "0.835161",    # 5: Объём в btc
     "71177.7285573",      # 7: Объём в котировочной валюте
 
-]'''
+]"""

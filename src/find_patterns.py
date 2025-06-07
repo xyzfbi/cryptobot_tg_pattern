@@ -25,34 +25,34 @@ def find_patterns(data_df: pd.DataFrame, lookback_period: int = 15) -> pd.DataFr
 
     for pattern in candlestick_patterns.keys():
         pattern_func = getattr(talib, pattern)
-        patterns_results = pattern_func(data_df['open'],
-                                        data_df['high'],
-                                        data_df['low'],
-                                        data_df['close']
-                                        )
-        '''print(patterns_results)
+        patterns_results = pattern_func(data_df["open"], data_df["high"], data_df["low"], data_df["close"])
+        """print(patterns_results)
         print(patterns_results)
         print(type(patterns_results))
-        print(patterns_results.columns)'''
+        print(patterns_results.columns)"""
 
         for i in data_df.head(lookback_period).index:  # перебираем крч по исхожному индексу
             if patterns_results.iloc[i] != 0:
                 candle_num = i
-                datetime_candle = data_df.loc[i, 'datetime']
+                datetime_candle = data_df.loc[i, "datetime"]
                 direction = "bullish" if patterns_results.iloc[i] > 0 else "bearish"  # это функция возвращает
-                weight = candle_rankings.get(f"{pattern}_Bull" if direction == "bullish" else f"{pattern}_Bear",
-                                             0)  # это конфиг смотрит ранги
+                weight = candle_rankings.get(
+                    f"{pattern}_Bull" if direction == "bullish" else f"{pattern}_Bear",
+                    0,
+                )  # это конфиг смотрит ранги
                 value = patterns_results.iloc[i]  # это просто возвраащет значение талибовской функции
                 # print(candle_num, pattern, direction, weight, value)
 
-                result.append({
-                    'candle_num': candle_num,
-                    'datetime': datetime_candle,
-                    'direction': direction,
-                    'pattern': pattern,  # имя паттерна
-                    'value': value,  # bullish / bearish возвращает функция талиб
-                    'weight': weight  # вес по #https://thepatternsite.com/
-                })
+                result.append(
+                    {
+                        "candle_num": candle_num,
+                        "datetime": datetime_candle,
+                        "direction": direction,
+                        "pattern": pattern,  # имя паттерна
+                        "value": value,  # bullish / bearish возвращает функция талиб
+                        "weight": weight,  # вес по #https://thepatternsite.com/
+                    }
+                )
 
     # result_df = pd.DataFrame(result).sort_values(['weight'], ascending=[False])
     result_df = pd.DataFrame(result)
@@ -69,11 +69,13 @@ def confirm_patterns(data_htf: pd.DataFrame, data_ltf: pd.DataFrame) -> pd.DataF
         confirmed = False
         for _, pattern in patterns_htf.iterrows():
             # print(f"Comparing {row_ltf['pattern']} ({row_ltf['datetime']}) with {pattern['pattern']} ({pattern['datetime']})")
-            if (row_ltf['pattern'] == pattern['pattern'] and
-                    pattern['datetime'] <= row_ltf['datetime'] and
-                    abs(row_ltf['datetime'] - pattern['datetime']) <= pd.Timedelta(
-                        days=3) and  # если был 3 дня назад максимум
-                    pattern['value'] == row_ltf['value']):
+            if (
+                row_ltf["pattern"] == pattern["pattern"]
+                and pattern["datetime"] <= row_ltf["datetime"]
+                and abs(row_ltf["datetime"] - pattern["datetime"])
+                <= pd.Timedelta(days=3)  # если был 3 дня назад максимум
+                and pattern["value"] == row_ltf["value"]
+            ):
                 # print(f"Confirmed: {row_ltf['pattern']} at {row_ltf['datetime']}")
                 confirmed = True
                 break

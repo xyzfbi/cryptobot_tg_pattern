@@ -6,30 +6,35 @@ import talib as ta
 
 
 # calculate ichimoku   !!!!
-def calculate_ichimoku(df: pd.DataFrame, tenkan_num: int = 9, kijun_period: int = 26, senkou_period: int = 52):
+def calculate_ichimoku(
+    df: pd.DataFrame,
+    tenkan_num: int = 9,
+    kijun_period: int = 26,
+    senkou_period: int = 52,
+):
     result_df = pd.DataFrame()
 
-    tenkan_high = df['high'].rolling(tenkan_num).max()
-    tenkan_low = df['low'].rolling(tenkan_num).min()
-    result_df['tenkan_sen'] = (tenkan_high + tenkan_low) / 2
+    tenkan_high = df["high"].rolling(tenkan_num).max()
+    tenkan_low = df["low"].rolling(tenkan_num).min()
+    result_df["tenkan_sen"] = (tenkan_high + tenkan_low) / 2
 
-    kijun_high = df['high'].rolling(kijun_period).max()
-    kijun_low = df['low'].rolling(kijun_period).min()
-    result_df['kijun_sen'] = (kijun_high + kijun_low) / 2
+    kijun_high = df["high"].rolling(kijun_period).max()
+    kijun_low = df["low"].rolling(kijun_period).min()
+    result_df["kijun_sen"] = (kijun_high + kijun_low) / 2
 
-    result_df['senkou_span_a'] = ((result_df['tenkan_sen'] + result_df['kijun_sen']) / 2).shift(kijun_period)
+    result_df["senkou_span_a"] = ((result_df["tenkan_sen"] + result_df["kijun_sen"]) / 2).shift(kijun_period)
 
-    senkou_high = df['high'].rolling(senkou_period).max()
-    senkou_low = df['low'].rolling(senkou_period).min()
-    result_df['senkou_span_b'] = ((senkou_high + senkou_low) / 2).shift(kijun_period)
+    senkou_high = df["high"].rolling(senkou_period).max()
+    senkou_low = df["low"].rolling(senkou_period).min()
+    result_df["senkou_span_b"] = ((senkou_high + senkou_low) / 2).shift(kijun_period)
 
-    result_df['chikou_span'] = df['close'].shift(-kijun_period)
+    result_df["chikou_span"] = df["close"].shift(-kijun_period)
 
-    result_df['cloud_green'] = result_df['senkou_span_a'] > result_df['senkou_span_b']
-    result_df['cloud_red'] = result_df['senkou_span_a'] < result_df['senkou_span_b']
+    result_df["cloud_green"] = result_df["senkou_span_a"] > result_df["senkou_span_b"]
+    result_df["cloud_red"] = result_df["senkou_span_a"] < result_df["senkou_span_b"]
 
-    result_df['leading_senkou_span_a'] = result_df['senkou_span_a'].shift(-kijun_period)
-    result_df['leading_senkou_span_b'] = result_df['senkou_span_b'].shift(-kijun_period)
+    result_df["leading_senkou_span_a"] = result_df["senkou_span_a"].shift(-kijun_period)
+    result_df["leading_senkou_span_b"] = result_df["senkou_span_b"].shift(-kijun_period)
 
     return result_df
 
@@ -37,11 +42,11 @@ def calculate_ichimoku(df: pd.DataFrame, tenkan_num: int = 9, kijun_period: int 
 # вычисление всех нужных индикаторов
 def find_indicators(highframe_df: pd.DataFrame, lowframe_df: pd.DataFrame) -> Tuple[DataFrame, DataFrame]:
     # module high time frame
-    high_htf = highframe_df['high']
+    high_htf = highframe_df["high"]
     close_htf = highframe_df["close"]
     low_htf = highframe_df["low"]
 
-    high_ltf = lowframe_df['high']
+    high_ltf = lowframe_df["high"]
     close_ltf = lowframe_df["close"]
     low_ltf = lowframe_df["low"]
 
@@ -53,13 +58,14 @@ def find_indicators(highframe_df: pd.DataFrame, lowframe_df: pd.DataFrame) -> Tu
 
     # form indicators HIGH timeframe
 
-    indicators_htf = pd.DataFrame({
-        'sma150': sma150_htf,  # общий тренд
-        'adx': adx_htf,  # сила тренда
-        'plus_di': plusdi_htf,
-        'minus_di': minusdi_htf,
-
-    })
+    indicators_htf = pd.DataFrame(
+        {
+            "sma150": sma150_htf,  # общий тренд
+            "adx": adx_htf,  # сила тренда
+            "plus_di": plusdi_htf,
+            "minus_di": minusdi_htf,
+        }
+    )
     indicators_htf = pd.concat([indicators_htf, ichimoku_htf], axis=1)
 
     # module low timeframee
@@ -72,14 +78,16 @@ def find_indicators(highframe_df: pd.DataFrame, lowframe_df: pd.DataFrame) -> Tu
     atr7_ltf = ta.ATR(high_ltf, low_ltf, close_ltf, 7)  # ATR 7 CANDLES
 
     # form indicators LOW timeframe
-    indicators_ltf = pd.DataFrame({
-        'ema50': ema50_ltf,
-        'rsi12': rsi12_ltf,
-        'rsi25': rsi25_ltf,
-        'atr7': atr7_ltf,
-        'macd': macd_line,
-        'macd_signal': macd_signal,
-    })
+    indicators_ltf = pd.DataFrame(
+        {
+            "ema50": ema50_ltf,
+            "rsi12": rsi12_ltf,
+            "rsi25": rsi25_ltf,
+            "atr7": atr7_ltf,
+            "macd": macd_line,
+            "macd_signal": macd_signal,
+        }
+    )
 
     return indicators_htf, indicators_ltf
 

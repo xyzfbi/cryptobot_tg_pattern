@@ -1,7 +1,6 @@
 from src.find_patterns import confirm_patterns
 from src.calculate_indicators import find_indicators
 from src.receive_bybit import CandlesData
-from decimal import Decimal
 from typing import Any, Tuple, List, Dict, Optional, Union
 import pandas as pd
 
@@ -29,28 +28,28 @@ class TradingStrategy:
 
     def _fill_last(self) -> None:
         self.last = {
-            'price': self.trend_data['close'].iloc[0],  # price now
-            'sma150': self.trend_indicators['sma150'].iloc[-1],  # простая скользящая средняя на 150 свеч
-            'adx': self.trend_indicators['adx'].iloc[-1],  # индекс силы тренда
-            'adx_plus': self.trend_indicators['plus_di'].iloc[-1],  # бычья сила
-            'adx_minus': self.trend_indicators['minus_di'].iloc[-1],  # медвежья сила
-            'tenkan': self.trend_indicators['tenkan_sen'].iloc[-1],  # ишимоку  че скзаать
-            'kijun': self.trend_indicators['kijun_sen'].iloc[-1],
+            "price": self.trend_data["close"].iloc[0],  # price now
+            "sma150": self.trend_indicators["sma150"].iloc[-1],  # простая скользящая средняя на 150 свеч
+            "adx": self.trend_indicators["adx"].iloc[-1],  # индекс силы тренда
+            "adx_plus": self.trend_indicators["plus_di"].iloc[-1],  # бычья сила
+            "adx_minus": self.trend_indicators["minus_di"].iloc[-1],  # медвежья сила
+            "tenkan": self.trend_indicators["tenkan_sen"].iloc[-1],  # ишимоку  че скзаать
+            "kijun": self.trend_indicators["kijun_sen"].iloc[-1],
             # https://ru.wikipedia.org/wiki/%D0%98%D0%BD%D0%B4%D0%B8%D0%BA%D0%B0%D1%82%D0%BE%D1%80_%D0%98%D1%88%D0%B8%D0%BC%D0%BE%D0%BA%D1%83
-            'senkou_a': self.trend_indicators['senkou_span_a'].iloc[-1],
+            "senkou_a": self.trend_indicators["senkou_span_a"].iloc[-1],
             # https://ru.wikipedia.org/wiki/%D0%98%D0%BD%D0%B4%D0%B8%D0%BA%D0%B0%D1%82%D0%BE%D1%80_%D0%98%D1%88%D0%B8%D0%BC%D0%BE%D0%BA%D1%83
-            'senkou_b': self.trend_indicators['senkou_span_b'].iloc[-1],
+            "senkou_b": self.trend_indicators["senkou_span_b"].iloc[-1],
             # https://ru.wikipedia.org/wiki/%D0%98%D0%BD%D0%B8%D0%BA%D0%B0%D1%82%D0%BE%D1%80_%D0%98%D1%88%D0%B8%D0%BC%D0%BE%D0%BA%D1%83
             # индикаторы на 50 свеч макс по младшему тф
-            'ema50': self.pattern_indicators['ema50'].iloc[-1],  # экспоненциальная скользящая средняя
-            'rsi12': self.pattern_indicators['rsi12'].iloc[-1],
+            "ema50": self.pattern_indicators["ema50"].iloc[-1],  # экспоненциальная скользящая средняя
+            "rsi12": self.pattern_indicators["rsi12"].iloc[-1],
             # индекс перекупленности и перепроаднности 12 свеч младший таймфрейм
-            'rsi25': self.pattern_indicators['rsi25'].iloc[-1],
+            "rsi25": self.pattern_indicators["rsi25"].iloc[-1],
             # индекс перекупленности и перепроаднности 25 свеч младший фрейм
-            'atr7': self.pattern_indicators['atr7'].iloc[-1],  # волатильность рынка поддержки
-            'macd': self.pattern_indicators['macd'].iloc[-1],
+            "atr7": self.pattern_indicators["atr7"].iloc[-1],  # волатильность рынка поддержки
+            "macd": self.pattern_indicators["macd"].iloc[-1],
             # https://ru.wikipedia.org/wiki/%D0%98%D0%BD%D0%B4%D0%B8%D0%BA%D0%B0%D1%82%D0%BE%D1%80_MACD
-            'macd_signal': self.pattern_indicators['macd_signal'].iloc[-1]
+            "macd_signal": self.pattern_indicators["macd_signal"].iloc[-1],
             # https://ru.wikipedia.org/wiki/%D0%98%D0%BD%D0%B8%D0%BA%D0%B0%D1%82%D0%BE%D1%80_MACD
         }
 
@@ -61,35 +60,34 @@ class TradingStrategy:
         self.sl, self.tp = self.sl_tp(self.signal)
 
     def find_trend(self) -> Tuple[str, str, Dict[str, any]]:
-
         # ЗАПРАЩИВАЕМ ПОСЛЕДНИЕ ЗНАЧЕНИЯ ИНДИКАТОРОВ ДЛЯ КАЖДОГО ФРЕЙМА
 
         # определение тренда - sma150 ichimoku ema
         trend_direction = "flat"
-        cloud_bull = self.last['senkou_a'] > self.last['senkou_b']
-        cloud_bear = self.last['senkou_a'] < self.last['senkou_b']
+        cloud_bull = self.last["senkou_a"] > self.last["senkou_b"]
+        cloud_bear = self.last["senkou_a"] < self.last["senkou_b"]
 
-        if self.last['price'] > self.last['sma150'] and cloud_bull:
-            if self.last['tenkan'] > self.last['kijun'] and self.last['price'] > self.last['ema50']:
+        if self.last["price"] > self.last["sma150"] and cloud_bull:
+            if self.last["tenkan"] > self.last["kijun"] and self.last["price"] > self.last["ema50"]:
                 trend_direction = "strong_bullish"
 
-            elif self.last['tenkan'] > self.last['kijun']:
+            elif self.last["tenkan"] > self.last["kijun"]:
                 trend_direction = "bullish"
 
-        elif self.last['price'] < self.last['sma150'] and cloud_bear:
-            if self.last['tenkan'] < self.last['kijun'] and self.last['price'] < self.last['ema50']:
+        elif self.last["price"] < self.last["sma150"] and cloud_bear:
+            if self.last["tenkan"] < self.last["kijun"] and self.last["price"] < self.last["ema50"]:
                 trend_direction = "strong_bearish"
 
-            elif self.last['tenkan'] < self.last['kijun']:
+            elif self.last["tenkan"] < self.last["kijun"]:
                 trend_direction = "bearish"
 
         # определение силы тренда ADX
         trend_strength = "weak"
-        if self.last['adx'] > 20:
-            if self.last['adx_plus'] > self.last['adx_minus']:
-                trend_strength = "bullish_strong" if self.last['adx'] > 40 else "bullish_weak"
+        if self.last["adx"] > 20:
+            if self.last["adx_plus"] > self.last["adx_minus"]:
+                trend_strength = "bullish_strong" if self.last["adx"] > 40 else "bullish_weak"
             else:
-                trend_strength = "bearish_strong" if self.last['adx'] > 49 else "bearish_weak"
+                trend_strength = "bearish_strong" if self.last["adx"] > 49 else "bearish_weak"
 
         return trend_direction, trend_strength, self.last
 
@@ -105,31 +103,31 @@ class TradingStrategy:
             # продвинктая система sl и tp
             # inspired trading view
             sl_candidates = [
-                self.last['kijun'],
-                self.last['tenkan'],
-                self.last['ema50'] - atr_multiplier * self.last['atr7'],
-                self.last['senkou_b'] if self.last['senkou_b'] < self.last['price'] else None
+                self.last["kijun"],
+                self.last["tenkan"],
+                self.last["ema50"] - atr_multiplier * self.last["atr7"],
+                self.last["senkou_b"] if self.last["senkou_b"] < self.last["price"] else None,
             ]
             sl = min([x for x in sl_candidates if x is not None])
             sl *= sl_multiplier
-            tp = [self.last['price'] + m * self.last['atr7'] for m in tp_multipliers]
-            if self.last['senkou_a'] > self.last['price']:
-                tp.append(self.last['senkou_a'])
+            tp = [self.last["price"] + m * self.last["atr7"] for m in tp_multipliers]
+            if self.last["senkou_a"] > self.last["price"]:
+                tp.append(self.last["senkou_a"])
 
         elif signal == "sell":
             # inspired trading view
             sl_candidates = [
-                self.last['kijun'],
-                self.last['tenkan'],
-                self.last['ema50'] + atr_multiplier * self.last['atr7'],
-                self.last['senkou_b'] if self.last['senkou_b'] > self.last['price'] else None
+                self.last["kijun"],
+                self.last["tenkan"],
+                self.last["ema50"] + atr_multiplier * self.last["atr7"],
+                self.last["senkou_b"] if self.last["senkou_b"] > self.last["price"] else None,
             ]
             sl = max([x for x in sl_candidates if x is not None])
             sl *= sl_multiplier
 
-            tp = [self.last['price'] - m * self.last['atr7'] for m in tp_multipliers]
-            if self.last['senkou_a'] < self.last['price']:
-                tp.append(self.last['senkou_a'])
+            tp = [self.last["price"] - m * self.last["atr7"] for m in tp_multipliers]
+            if self.last["senkou_a"] < self.last["price"]:
+                tp.append(self.last["senkou_a"])
 
         return sl, [float(round(x, 2)) for x in tp if x is not None]
 
@@ -141,36 +139,36 @@ class TradingStrategy:
         bear_trend = ["strong_bearish", "bearish"]
         min_weight = 25
         if confirmed_patterns.empty:
-            return 'hold_no_pattern'
+            return "hold_no_pattern"
 
         # доп условия для входа
-        macd_bull = last['macd'] > last['macd_signal']
-        macd_bear = last['macd'] < last['macd_signal']
-        price_above_cloud = last['price'] > max(last['senkou_a'], last['senkou_b'])
-        price_below_cloud = last['price'] < min(last['senkou_a'], last['senkou_b'])
+        macd_bull = last["macd"] > last["macd_signal"]
+        macd_bear = last["macd"] < last["macd_signal"]
+        price_above_cloud = last["price"] > max(last["senkou_a"], last["senkou_b"])
+        price_below_cloud = last["price"] < min(last["senkou_a"], last["senkou_b"])
         weight_in_conditions = 0.02
 
         weight_patterns_bull = sum(
-            row['weight'] * weight_in_conditions
+            row["weight"] * weight_in_conditions
             for _, row in confirmed_patterns.iterrows()
-            if row['value'] == 100 and row['weight'] > min_weight  # влияние паттернов вычисляется по весу
+            if row["value"] == 100 and row["weight"] > min_weight  # влияние паттернов вычисляется по весу
         )
         weight_patterns_bear = sum(
-            row['weight'] * weight_in_conditions
+            row["weight"] * weight_in_conditions
             for _, row in confirmed_patterns.iterrows()
-            if row['value'] == -100 and row['weight'] > min_weight  # влияние паттернов вычисляется по весу
+            if row["value"] == -100 and row["weight"] > min_weight  # влияние паттернов вычисляется по весу
         )
 
         # generate signal by using trading view system
         if trend_direction in bull_trend:
             # inspired trading view
             conditions_count = [
-                last['price'] > last['ema50'],
-                30 < last['rsi12'] < 65,
+                last["price"] > last["ema50"],
+                30 < last["rsi12"] < 65,
                 macd_bull,
                 price_above_cloud,
-                last['tenkan'] > last['kijun'],
-                weight_patterns_bull
+                last["tenkan"] > last["kijun"],
+                weight_patterns_bull,
             ]
             if sum(bool(x) for x in conditions_count) >= 5:  # Минимум 5 из 6 условий
                 return "buy"
@@ -178,12 +176,12 @@ class TradingStrategy:
         elif trend_direction in bear_trend:
             # inspired trading view
             conditions_count = [
-                last['price'] < last['ema50'],
-                70 > last['rsi25'] > 35,
+                last["price"] < last["ema50"],
+                70 > last["rsi25"] > 35,
                 macd_bear,
                 price_below_cloud,
-                last['tenkan'] < last['kijun'],
-                weight_patterns_bear
+                last["tenkan"] < last["kijun"],
+                weight_patterns_bear,
             ]
             if sum(bool(x) for x in conditions_count) >= 4:
                 return "sell"
