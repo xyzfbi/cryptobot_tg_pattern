@@ -6,7 +6,7 @@ from pybit.unified_trading import HTTP
 session = HTTP()
 
 
-def get_available_coins() -> List[str]:
+def get_available_coins() -> list[str]:
     response = session.get_instruments_info(category="spot")
 
     symbols = response["result"]["list"]

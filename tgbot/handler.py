@@ -1,14 +1,16 @@
-from typing import Tuple, Union
-from aiogram import Bot, Router, Dispatcher
-from aiogram.filters import Command
-from aiogram.types import Message, FSInputFile
-from dotenv import load_dotenv
-import os
 import logging
-import tgbot.keyboard as kb
-import src.receive_bybit as rcv_bybit
-import src.find_trend as find_trend
+import os
+from typing import Tuple, Union
+
+from aiogram import Bot, Dispatcher, Router
+from aiogram.filters import Command
+from aiogram.types import FSInputFile, Message
+from dotenv import load_dotenv
+
 import src.data_to_jpg as graph
+import src.find_trend as find_trend
+import src.receive_bybit as rcv_bybit
+import tgbot.keyboard as kb
 
 load_dotenv()  # енв файлик
 TOKEN = os.getenv("API_KEY")
@@ -73,13 +75,12 @@ async def send_feedback(message: Message) -> None:
 
 
 # analyzer ->
-def analyzer(symbol: str, timeframe: str) -> Tuple[find_trend.TradingStrategy, Union[str, int], Union[str, int]]:
+def analyzer(symbol: str, timeframe: str) -> tuple[find_trend.TradingStrategy, Union[str, int], Union[str, int]]:
     # dict with keys that user send to a bot, and it gives to bybit api correct nums
     timeframes = {"15 minutes": 15, "1 hour": 60, "4 hours": 240, "1 day": "D"}
 
     keys = list(timeframes.values())  # 15 60 'D'
     cur_tf = timeframes[timeframe]  # 15
-
     idx = keys.index(cur_tf)  # 0
     next_tf = keys[idx + 1]
 
@@ -139,11 +140,8 @@ async def handle_message(message: Message) -> None:
         await message.answer("Analyzing your coin", reply_markup=None)
 
         result_obj, current_timeframe, next_timeframe = analyzer(symbol, timeframe)
-        """
-        print(current_timeframe)
-        print(next_timeframe)
-        """
         data_obj = rcv_bybit.CandlesData(symbol)
+
         for_jpg_data = data_obj.get_trend_data(timeframe=next_timeframe)
 
         graph.depict_candle_graph(
@@ -171,6 +169,6 @@ async def main() -> None:
     dp.include_router(router)
 
     try:
-        await dp.start_polling(bot, timeout_sec=120)
+        await dp.start_polling(bot)
     finally:
         await bot.session.close()

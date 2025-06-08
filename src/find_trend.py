@@ -1,8 +1,10 @@
-from src.find_patterns import confirm_patterns
-from src.calculate_indicators import find_indicators
-from src.receive_bybit import CandlesData
-from typing import Any, Tuple, List, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 import pandas as pd
+
+from src.calculate_indicators import find_indicators
+from src.find_patterns import confirm_patterns
+from src.receive_bybit import CandlesData
 
 
 class TradingStrategy:
@@ -17,11 +19,11 @@ class TradingStrategy:
 
         self.trend_direction: Optional[str] = None
         self.trend_strength: Optional[str] = None
-        self.last: Optional[Dict[str, Any]] = None
+        self.last: Optional[dict[str, Any]] = None
         self.confirmed_patterns: Optional[pd.DataFrame] = None
         self.signal: Optional[str] = None
         self.sl: Optional[float] = None
-        self.tp: Optional[List[float]] = None
+        self.tp: Optional[list[float]] = None
 
         self._fill_last()
         self._analyze()
@@ -33,7 +35,7 @@ class TradingStrategy:
             "adx": self.trend_indicators["adx"].iloc[-1],  # индекс силы тренда
             "adx_plus": self.trend_indicators["plus_di"].iloc[-1],  # бычья сила
             "adx_minus": self.trend_indicators["minus_di"].iloc[-1],  # медвежья сила
-            "tenkan": self.trend_indicators["tenkan_sen"].iloc[-1],  # ишимоку  че скзаать
+            "tenkan": self.trend_indicators["tenkan_sen"].iloc[-1],  # ишимоку че скзаать
             "kijun": self.trend_indicators["kijun_sen"].iloc[-1],
             # https://ru.wikipedia.org/wiki/%D0%98%D0%BD%D0%B4%D0%B8%D0%BA%D0%B0%D1%82%D0%BE%D1%80_%D0%98%D1%88%D0%B8%D0%BC%D0%BE%D0%BA%D1%83
             "senkou_a": self.trend_indicators["senkou_span_a"].iloc[-1],
@@ -59,7 +61,7 @@ class TradingStrategy:
         self.signal = self.generate_signal(self.trend_direction, self.last, self.confirmed_patterns)
         self.sl, self.tp = self.sl_tp(self.signal)
 
-    def find_trend(self) -> Tuple[str, str, Dict[str, any]]:
+    def find_trend(self) -> tuple[str, str, dict[str, any]]:
         # ЗАПРАЩИВАЕМ ПОСЛЕДНИЕ ЗНАЧЕНИЯ ИНДИКАТОРОВ ДЛЯ КАЖДОГО ФРЕЙМА
 
         # определение тренда - sma150 ichimoku ema
@@ -87,12 +89,12 @@ class TradingStrategy:
             if self.last["adx_plus"] > self.last["adx_minus"]:
                 trend_strength = "bullish_strong" if self.last["adx"] > 40 else "bullish_weak"
             else:
-                trend_strength = "bearish_strong" if self.last["adx"] > 49 else "bearish_weak"
+                trend_strength = "bearish_strong" if self.last["adx"] > 40 else "bearish_weak"
 
         return trend_direction, trend_strength, self.last
 
     # sl tp через atr ema и ichimoku
-    def sl_tp(self, signal: str) -> Tuple[Optional[float], List[float]]:
+    def sl_tp(self, signal: str) -> tuple[Optional[float], list[float]]:
         sl = None
         tp = []
         sl_multiplier = 0.92
@@ -134,7 +136,7 @@ class TradingStrategy:
     # sl tp надо немного под паттерны переделать
 
     @staticmethod
-    def generate_signal(trend_direction: str, last: Dict[str, any], confirmed_patterns: pd.DataFrame) -> str:
+    def generate_signal(trend_direction: str, last: dict[str, any], confirmed_patterns: pd.DataFrame) -> str:
         bull_trend = ["strong_bullish", "bullish"]  # pep8
         bear_trend = ["strong_bearish", "bearish"]
         min_weight = 25
@@ -170,7 +172,7 @@ class TradingStrategy:
                 last["tenkan"] > last["kijun"],
                 weight_patterns_bull,
             ]
-            if sum(bool(x) for x in conditions_count) >= 5:  # Минимум 5 из 6 условий
+            if sum(bool(x) for x in conditions_count) >= 4:  # Минимум 4 из 6 условий
                 return "buy"
 
         elif trend_direction in bear_trend:

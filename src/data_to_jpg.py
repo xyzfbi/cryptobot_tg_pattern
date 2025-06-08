@@ -1,14 +1,15 @@
+import os
 from typing import Union
 
-import pandas as pd
-import os
-from src.receive_bybit import CandlesData
-import matplotlib.pyplot as plt
-from mplfinance.original_flavor import candlestick_ohlc
 import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+import pandas as pd
 from matplotlib import font_manager as fm
+from mplfinance.original_flavor import candlestick_ohlc
+
 from src.find_trend import TradingStrategy
+from src.receive_bybit import CandlesData
 
 
 def depict_candle_graph(
@@ -111,7 +112,7 @@ def depict_candle_graph(
             "",
             xy=(arrow_x, arrow_y + y_range),
             xytext=(arrow_x, arrow_y),
-            arrowprops=dict(facecolor=color, shrink=0, width=10, headwidth=28),
+            arrowprops={"facecolor": color, "shrink": 0, "width": 10, "headwidth": 28},
             fontsize=12,
             color=color,
         )
@@ -158,7 +159,7 @@ def depict_candle_graph(
             "",
             xy=(arrow_x + y_range, arrow_y),
             xytext=(arrow_x, arrow_y),
-            arrowprops=dict(facecolor=color, shrink=0, width=10, headwidth=28),
+            arrowprops={"facecolor": color, "shrink": 0, "width": 10, "headwidth": 28},
             fontsize=12,
             color=color,
         )
@@ -177,18 +178,6 @@ def depict_candle_graph(
     path = os.path.join("tgbot", "buf.png")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     plt.savefig(path)
-
-
-class DepictCandleGraph:
-    def __init__(self, candle_data):
-        self.candle_data = candle_data
-
-    @staticmethod
-    def depict_candle_white(self):
-        pass
-
-    def depict_candle_black(self, symbol="BTCUSDT"):
-        pass
 
 
 if __name__ == "__main__":

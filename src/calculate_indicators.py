@@ -1,8 +1,10 @@
 from typing import Tuple
-from pandas import DataFrame
-from src.receive_bybit import CandlesData
+
 import pandas as pd
 import talib as ta
+from pandas import DataFrame
+
+from src.receive_bybit import CandlesData
 
 
 # calculate ichimoku   !!!!
@@ -40,7 +42,7 @@ def calculate_ichimoku(
 
 
 # вычисление всех нужных индикаторов
-def find_indicators(highframe_df: pd.DataFrame, lowframe_df: pd.DataFrame) -> Tuple[DataFrame, DataFrame]:
+def find_indicators(highframe_df: pd.DataFrame, lowframe_df: pd.DataFrame) -> tuple[DataFrame, DataFrame]:
     # module high time frame
     high_htf = highframe_df["high"]
     close_htf = highframe_df["close"]
@@ -50,6 +52,7 @@ def find_indicators(highframe_df: pd.DataFrame, lowframe_df: pd.DataFrame) -> Tu
     close_ltf = lowframe_df["close"]
     low_ltf = lowframe_df["low"]
 
+    # INDICATORS HIGHTIME FRAME
     sma150_htf = ta.SMA(close_htf, 150)
     adx_htf = ta.ADX(high_htf, low_htf, close_htf, 14)
     plusdi_htf = ta.PLUS_DI(high_htf, low_htf, close_htf, 14)

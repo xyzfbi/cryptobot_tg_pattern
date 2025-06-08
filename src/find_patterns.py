@@ -1,16 +1,17 @@
-import talib
 import pandas as pd
+import talib
+
+from src.patterns_config import candle_rankings, candlestick_patterns
 from src.receive_bybit import CandlesData
-from src.patterns_config import candlestick_patterns, candle_rankings
 
 """
 пары таймфреймов и свечи
     1. m1 = 75 150/2
     1. M5 = 40 80/2
-    
+
     2. M15 = 25 150 /2
-    2. H1 = 18 
-    
+    2. H1 = 18
+
     3. H4 = 13 25/2 round
     3. D1 = 8
 """
@@ -23,13 +24,9 @@ def find_patterns(data_df: pd.DataFrame, lookback_period: int = 15) -> pd.DataFr
 
     result = []
 
-    for pattern in candlestick_patterns.keys():
+    for pattern in candlestick_patterns:
         pattern_func = getattr(talib, pattern)
         patterns_results = pattern_func(data_df["open"], data_df["high"], data_df["low"], data_df["close"])
-        """print(patterns_results)
-        print(patterns_results)
-        print(type(patterns_results))
-        print(patterns_results.columns)"""
 
         for i in data_df.head(lookback_period).index:  # перебираем крч по исхожному индексу
             if patterns_results.iloc[i] != 0:
@@ -54,7 +51,6 @@ def find_patterns(data_df: pd.DataFrame, lookback_period: int = 15) -> pd.DataFr
                     }
                 )
 
-    # result_df = pd.DataFrame(result).sort_values(['weight'], ascending=[False])
     result_df = pd.DataFrame(result)
     return result_df
 
@@ -68,7 +64,6 @@ def confirm_patterns(data_htf: pd.DataFrame, data_ltf: pd.DataFrame) -> pd.DataF
     for _, row_ltf in patterns_ltf.iterrows():
         confirmed = False
         for _, pattern in patterns_htf.iterrows():
-            # print(f"Comparing {row_ltf['pattern']} ({row_ltf['datetime']}) with {pattern['pattern']} ({pattern['datetime']})")
             if (
                 row_ltf["pattern"] == pattern["pattern"]
                 and pattern["datetime"] <= row_ltf["datetime"]

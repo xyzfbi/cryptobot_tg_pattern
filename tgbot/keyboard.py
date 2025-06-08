@@ -1,12 +1,10 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 
 def get_main_keyboard() -> ReplyKeyboardMarkup:
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
-            [
-                KeyboardButton(text="Timeframe ⏳"),
-            ],
+            [KeyboardButton(text="Timeframe ⏳")],
             [KeyboardButton(text="Choose coin 🪙")],
             [KeyboardButton(text="Analyze 👀")],
             [KeyboardButton(text="/help")],
