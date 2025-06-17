@@ -16,3 +16,4 @@ __pycache__/
 /dataSources.local.xml
 /data
 tgbot/buf.png
+.env
